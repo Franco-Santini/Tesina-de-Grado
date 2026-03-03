@@ -1,0 +1,491 @@
+---
+format:
+  pdf:
+    papersize: A4
+    title-page: false
+    include-before-body: caratula.tex 
+    include-in-header: preamble.tex
+    indent: true
+    number-sections: TRUE
+    geometry:
+      - top=25mm
+      - left=25mm
+      - right=25mm
+      - bottom=25mm
+      - heightrounded
+    fontsize: 12pt
+mainfont: Calibri
+lang: es
+fig-pos: H
+message: false
+warning: false
+echo: false
+header-includes:
+  - \usepackage{setspace}
+  - \onehalfspacing
+---
+
+### Pagina de Agradecimientos
+
+### Resumen
+
+# Introducción
+
+El análisis y pronóstico de series temporales es una herramienta fundamental en diversas áreas aplicadas -economía, salud, movilidad, transporte, energía, educación y políticas públicas- debido a su capacidad para describir la evolución de los fenómenos y anticipar escenarios futuros. Sin embargo, los métodos tradicionales suelen basarse en la suposición de estabilidad de los patrones históricos y de continuidad estructural. Esta característica puede generar dificultades cuando las series se ven atravesadas por eventos disruptivos que alteran la regularidad de su comportamiento.
+
+Los *shocks* exógenos provenientes de pandemias, reformas regulatorias, cambios profundos en los comportamientos sociales, interrupciones en infraestructuras o eventos extraordinarios generan alteraciones significativas en las series temporales. En muchos casos, estos eventos se manifiestan a través de quiebres de nivel, cambios en la tendencia y la estacionalidad, observaciones atípicas extremas y procesos de recuperación no lineales. La irrupción simultánea de alguno de estos fenómenos desafía los supuestos y la capacidad de adaptación de la mayoría de los modelos clásicos, dificultando la obtención de pronósticos precisos, especialmente cuando se busca comprender el comportamiento inmediato posterior a la disrupción y la trayectoria de recuperación.
+
+Un caso particularmente relevante en Argentina y a nivel mundial es la pandemia de COVID-19. Durante el año 2020, esta produjo una alteración abrupta en las series de movilidad y transporte urbano: el volumen de pasajeros transportados cayó a mínimos históricos debido a las restricciones de circulación, seguido de una recuperación lenta y heterogénea a medida que las restricciones se fueron flexibilizando. Estas características convierten a las series de transporte y movilidad en un entorno ideal para el análisis de metodologías robustas para el tratamiento de series temporalmente interrumpidas.
+
+Recientemente, Hyndman y Rostami-Tabar (2024) han sistematizado diversas estrategias para el tratamiento y pronóstico de series interrumpidas, incluyendo modelos altamente adaptativos, modelos de intervención, métodos contrafactuales y combinaciones (*ensembles*), planteando un marco conceptual que resulta particularmente relevante para series afectadas por *shocks* como los observados en el transporte urbano durante la pandemia.
+
+En este contexto, la presente tesina propone evaluar y comparar metodologías modernas de pronóstico para series interrumpidas, aplicándolas específicamente a la serie mensual de pasajeros del Transporte Urbano de Pasajeros (TUP) de la ciudad de Rosario, con el objetivo de analizar el desempeño de las distintas estrategias durante el período disruptivo y en la etapa posterior.
+
+\newpage
+
+# Objetivos
+
+## Objetivo general
+
+Evaluar comparativamente distintas metodologías de pronóstico aplicables a series temporales univariadas interrumpidas, mediante su aplicación a la serie de pasajeros del transporte urbano de Rosario, con el fin de analizar su desempeño predictivo en distintos momentos del ciclo disruptivo.
+
+## Objetivos específicos
+
+\setlength{\parindent}{0pt}
+
+- Realizar un análisis descriptivo detallado de la serie, identificando el período de interrupción y sus efectos sobre la tendencia y estacionalidad.
+
+- Ajustar modelos ARIMA y SARIMA como línea de base, evaluando su estabilidad en presencia de eventos disruptivos.
+
+- Implementar modelos altamente adaptativos (ETS) y analizar su capacidad de ajuste durante la disrupción.
+
+- Ajustar modelos de intervención (regresión con errores ARIMA), incorporando variables explicativas que representen el evento disruptivo.
+
+- Implementar modelos contrafactuales:
+
+  - Marcando el período disruptivo como faltante ("*set to missing*").
+  
+  - Reconstrucción del período mediante estimaciones de lo que podría haber sido ("*what might have been*").
+
+- Explorar combinaciones de modelos (*ensembles*) y evaluar si mejoran el desempeño.
+
+- Comparar todas las estrategias mediante métricas puntuales y probabilísticas (RMSE, MAE, MAPE y *Winkler Score*).
+
+- Elaborar recomendaciones metodológicas para el uso de estas estrategias en series temporales afectadas por disrupciones similares.
+
+\newpage
+
+# Metodología
+
+\setlength{\parindent}{1.5em}
+
+En esta sección se describen diversas estrategias para manejar interrupciones en el pronóstico de series temporales. El tratamiento de interrupciones en series de tiempo es un problema complejo y multifacético, y la elección de la estrategia más adecuada depende de las características específicas de los datos y de la naturaleza de la interrupción. Por ello, en la presente tesina se proponen múltiples estrategias en lugar de un único enfoque, con el fin de abordar de manera efectiva distintas situaciones y casos.
+
+## Conceptos básicos de series de tiempo
+
+Una serie de tiempo es una secuencia de observaciones ordenadas de una variable objetivo a lo largo del tiempo en intervalos regulares (cada día, cada mes, cada año, etc.). La naturaleza intrínseca de las series temporales es que sus observaciones son dependientes o correlacionadas, y por lo tanto, el orden de las observaciones es importante. Es por esto que ciertos procedimientos o técnicas que se basan en el supuesto de independencia no son aplicables y se necesitan de diferentes métodos. 
+
+Formalmente, un proceso estocástico es un conjunto de variables aleatorias ${y_t}$ donde el índice $t$ toma valores en un cierto conjunto $C$. En nuestro caso, este conjunto es ordenado y corresponde a los instantes temporales (días, meses, años, etc.). Para cada valor $t$ del conjunto $C$, es decir, para cada instante temporal, está definida una variable aleatoria $y_t$, y los valores observados de las variables aleatorias en distintos instantes forman una serie temporal. Por lo tanto, una serie de tiempo de $T$ datos, $(y_1, y_2, ..., y_T)$, es una muestra de tamaño uno del vector de $T$ variables aleatorias ordenadas en el tiempo correspondientes a los momentos $t = 1,...,T$, y la serie observada se considera una realización del proceso estocástico. 
+
+En el análisis de series temporales es esencial identificar los patrones que influyen en su comportamiento a lo largo del tiempo, ya que estos permiten comprender la dinámica de los datos y facilitan su adecuada modelización. Entre los principales componentes que pueden observarse en una serie temporal se destacan la tendencia, la estacionalidad, el componente cíclico y el componente aleatorio, los cuales se describen a continuación.
+
+- Tendencia: esta componente refleja un crecimiento o decrecimiento en la serie a través del tiempo, no tiene que ser necesariamente lineal. A veces se refiere a la tendencia como un cambio de dirección, cuando se pasa de una tendencia creciente a una decreciente.
+
+- Estacionalidad: es el comportamiento repetitivo de la serie en un período corto y conocido, esta componente está afectada por factores estacionales tales como el momento del año o el día de la semana entre otros.
+
+- Ciclo: corresponde a oscilaciones de largo plazo que se manifiestan en torno a la tendencia, sin una periodicidad fija, y cuya duración suele extenderse por un período no inferior a dos años.
+
+- Aleatorio: comprende las variaciones irregulares de la serie que no pueden ser atribuidas a la tendencia, la estacionalidad ni al componente cíclico. Dichas fluctuaciones responden, en general, a perturbaciones imprevisibles o a la influencia de factores externos no sistemáticos.  
+
+En el análisis de series temporales, es importante determinar si una serie es estacionaria o no lo es. Diremos que una serie es estacionaria en sentido débil si, para todo $t$:
+
+1. $E(y_t) = \mu_t = \mu = cte${#eq-esp},
+2. $Var(y_t) = \sigma_t^2 = \sigma^2 = cte${#eq-var},
+3. $Cov(y_t, y_{t-k}) = \gamma_k \ \ \ \ \ k = 0, \pm 1, \pm 2.${#eq-cov},
+
+Las dos primeras condiciones indican que la media y la variancia son constantes. La tercera, que la covariancia entre dos variables depende sólo de su separación. 
+
+Por otro lado, diremos que una serie es no estacionaria si la media, la variancia y la covariancia no son constantes a través del tiempo. Una forma de solucionar la no estacionariedad en media es tomando una cantidad adecuada de diferencias de la serie, es decir, si la serie $\{y_t\}$ es no estacionaria si tomamos una cantidad $d$ de diferencias se obtiene una nueva serie $\{(1-B)^dy_t\}$ para algún entero $d \geq 1$, que es estacionaria.
+
+Sin embargo, un proceso puede ser estacionario en media pero no en variancia y covariancia. Por lo tanto, para corregir este problema es necesario aplicar las transformaciones de Box-Cox a la variable objetivo, definida como:
+
+$$T(y_t) = \left\{\begin{matrix}
+\frac{y_t^{\lambda} - 1}{\lambda} \ si \ \lambda \neq 0 \\ ln(y_t) \ si \ \lambda = 0
+\end{matrix}\right.$${#eq-boxcox}
+
+### Autocorrelación
+
+La autocorrelación es una medida de asociación que mide la correlación entre una serie temporal y la misma serie en diferentes momentos. Es una herramienta fundamental en el análisis de series ya que permite detectar no aleatoriedad, identificar dependencias temporales y validar modelos de series temporales (por ejemplo, $AR$, $ARMA$, entre otros).
+
+#### Función de Autocorrelación
+
+La Función de Autocorrelación (ACF, por sus siglas en inglés) constituye una herramienta fundamental en el análisis de series temporales, ya que permite cuantificar el grado de asociación lineal entre los valores de la serie y sus propios valores pasados a distintos rezagos. Formalmente, la autocorrelación correspondiente a un rezago $k$ se define mediante la siguiente expresión:
+
+$$\rho_k = \frac{Cov(y_t, y_{t+k})}{\sqrt{Var(y_t)}\sqrt{Var(y_{t+k})}} = \frac{\gamma_k}{\gamma_0}$${#eq-autocor}
+
+donde $\rho_k$ es el coeficiente de autocorrelación para el rezago $k$, $y_t$ y $y_{t+k}$ son los valores de la serie en los tiempos $t$ y $t+k$ respectivamente y notar que $Var(y_{t}) = Var(y_{t+k}) = \gamma_0$.
+
+El coeficiente $\rho_k$ varía de -1 a 1. Si $rho_k$ esta cerca de 1 indica que los valores de la serie están altamente correlacionados con los valores rezagados en $k$ momentos. Si $rho_k$ está cerca de -1 indica que los valores de la serie están altamente correlacionados de forma negativa con los valores rezagados en $k$ momentos. Por último, si $\rho_k$ está cerca de 0 indica que no hay una correlación significativa entre los valores de la serie para ese rezago.
+
+#### Función de Autocorrelación Parcial
+
+La Función de Autocorrelación Parcial (PACF, por sus siglas en inglés) es una herramienta clave en el análisis de series temporales que permite medir la relación lineal directa entre una observación y su valor rezagado $k$, eliminando previamente el efecto de los rezagos intermedios $1, 2, ..., k-1$. A diferencia de la Función de Autocorrelación (ACF), que capta tanto efectos directos como indirectos entre los valores de la serie, la PACF aísla exclusivamente la contribución propia de cada rezago. La expresión de la autocorrelación parcial correspondiente al rezago $k$ resulta:
+
+$$\phi_{kk} = Corr(y_t, y_{t+k}|y_{t+1}, y_{t+2},...,y_{y+k-1})$${#eq-pacf}
+
+Esta función resulta especialmente útil en la etapa de identificación de modelos autorregresivos dentro de la metodología de Box-Jenkins, ya que un corte claro en la PACF suele indicar el posible orden $p$ de un modelo $AR(p)$.
+
+### Métodos de estimación de los parámetros
+
+Hablo un poco de los métodos de estimación?
+
+### Pronósticos
+
+Unos de los objetivos primordiales del análisis de series temporales es realizar pronósticos tanto puntuales como por intervalos de predicción de la variable en estudio haciendo uso de los modelos propuestos. Formalmente, los pronósticos puntuales a un horizonte $l$ con $l > 0$, se obtienen como:
+
+$$\hat{y}_{n}(l) = E(y_{n+l}|y_n,y_{n-1},...)$${#eq-pron}
+
+Se podria hablar de intervalos de predicción haciendo el supuesto de distribución normal y/o los intervalos de predicción utilizando boostrap.
+
+### Limitaciones en la modelización de series temporales
+
+Una de las potenciales limitaciones que puede afectar a la modelización de series temporales son las observaciones extremas, también conocidas como *outliers*, se la define como aquellas observaciones que se alejan del patrón regular de los datos, es decir que sobresalen notoriamente del resto de las observaciones. Muchas veces este tipo de datos no hay que tenerlos en cuenta en la modelización de la serie porque pueden afectar seriamente los resultados del análisis, pudiendo sugerir modelos no apropiados y de esa forma alterar los pronósticos. Estas observaciones pueden existir en un único punto, una secuencia transitoria de puntos extremos o un cambio de patrón de las observaciones que se mantiene en el tiempo.
+
+
+## ARIMA/SARIMA
+
+Los modelos ARIMA (*AutoRegressive Integrated Moving Average*) representan uno de los enfoques más utilizados y consolidados para el análisis y pronóstico de series temporales univariadas. Estos están compuestos por tres componentes esenciales: la parte autorregresiva (AR), el término integrado o de diferenciación (I) y la parte promedio móvil (MA). El modelo general se expresa como: 
+
+$$\phi_p(B) \nabla^d y_t = \theta_q(B) \varepsilon_t$${#eq-arima}
+
+\setlength{\parindent}{0pt}
+
+donde $y_t$ representa el valor observado, $\phi_p(B) = (1- \phi_1B - \cdots - \phi_pB^p)$ es el operador AR regular de orden p, $\nabla^d = (1-B)^d$ representa las diferencias regulares, $\theta_q(B) = (1 - \theta_1B - \cdots - \theta_qB^q)$ es el operador promedio móvil regular de orden q y $\varepsilon_t$ es un proceso ruido blanco que representa el error de la t-ésima observación.
+
+\setlength{\parindent}{1.5em}
+
+La componente autorregresiva modela la dependencia entre el valor actual de la serie y sus valores pasados, por lo que un proceso autorregresivo de órden $p$ se lo puede escribir como:
+
+$$\phi_p(B) y_t = \varepsilon_t$${#eq-ar}
+
+Este planteo es análogo a una regresión lineal múltiple, con la particularidad de que los predictores corresponden a valores rezagados de $y_t$. Este enfoque se denomina modelo autorregresivo $AR(p)$, el cual se formula, en general, series estacionarias y exige determinadas restricciones sobre sus parámetros. Por definición se tiene que un proceso $AR(p)$ es siempre invertible, pero para que sea estacionario es necesario que las raíces de $\phi_p(B) = 0$ caigan fuera del círculo unitario.
+
+La componente promedio móvil refleja la dependencia entre el valor actual de la serie y los errores de pronósticos previos, por lo que un proceso promedio móvil de órden $q$ se lo puede escribir como:
+
+$$y_t = \theta_q(B)\varepsilon_t$${#eq-ma}
+
+Por definición se tiene que este proceso es siempre estacionario, pero para que sea invertible es necesario que las raíces de $\theta_q(B) = 0$ caigan fuera del cículo unitario.
+
+Así, la incorporación conjunta de estas componentes y la utilización de un orden apropiado de diferenciación en la parte regular permiten capturar estructuras sistemáticas complejas, con el propósito de obtener un ajuste adecuado del modelo.
+
+Sin embargo, los modelos ARIMA no incorporan la estacionalidad de manera explícita, es por ello que, para series con ciclos recurrentes, como ocurre con series mensuales o trimestrales, se emplean los modelos SARIMA:
+
+$$\Phi_P(B^s) \phi_p(B) \nabla_s^D \nabla^d y_t = \theta_q(B) \Theta_Q(B^s) \varepsilon_t$${#eq-sarima}
+
+\setlength{\parindent}{0pt}
+
+donde $y_t$ representa el valor observado, $\Phi_P(B^s) = (1- \Phi_1B^s - \cdots - \Phi_PB^{sP})$ es el operador AR estacional de orden P, $\nabla_s^D = (1-B^s)^D$ representa las diferencias estacionales, $\Theta_Q(B^s) = (1 - \Theta_1B^s - \cdots - \Theta_QB^{sQ})$ es el operador promedio móvil estacional de orden Q y $\varepsilon_t$ es un proceso ruido blanco.
+
+\setlength{\parindent}{1.5em}
+
+(Agregar como sección la identificación y selección del mejor modelo)
+
+Si bien los modelos ARIMA y SARIMA constituyen un punto de partida indispensable, presentan limitaciones importantes cuando la serie contiene eventos disruptivos abruptos. Bajo estas circunstancias, los parámetros estimados a partir de datos previos a la disrupción pueden no reflejar adecuadamente el comportamiento posterior. Asimismo, la adaptación del modelo al patrón estacional posterior puede ser lento o inestable.
+
+Por estas razones, en este trabajo los modelos ARIMA y SARIMA se consideran como modelos de referencia (*baseline*) para la comparación con enfoques diseñados explícitamente para capturar interrupciones, tal como proponen Hyndman y Rostami-Tabar (2024).
+
+## Modelos altamente adaptativos (ETS)
+
+Los modelos de suavizado exponencial, o modelos ETS (*Error–Trend–Seasonality*), constituyen una familia alternativa caracterizada por su capacidad de adaptarse rápidamente a cambios recientes en la estructura de la serie. Estos modelos pueden ajustarse a la interrupción a medida que ocurre. Por lo tanto, suelen aproximarse relativamente bien al proceso de generación de datos. Su formulación se basa en la actualización recursiva de componentes no observados (error, tendencia y estacionalidad), utilizando ponderaciones decrecientes para las observaciones pasadas.
+
+\setlength{\parindent}{0pt}
+
+La estructura general del modelo se compone de:
+
+- una componente de error (E) que describe la variabilidad de los datos que no se puede explicar por la tendencia ni por la estacionalidad.
+
+- una componente de tendencia (T) que explica la dirección que sigue la serie temporal, puede ser creciente, decreciente o nula.
+
+- una componente de estacionalidad (S) que se refiere al comportamiento repetitivo en intervalos regulares específicos que tiene la serie temporal.
+
+\setlength{\parindent}{1.5em}
+
+Estos tres componentes pueden introducirse al modelo de forma aditiva (A), multiplicativa (M), o
+en el caso de la tendencia y estacionalidad no incluirse (N). Por ejemplo, un modelo ETS(A,N,M)
+indica que el error ingresa de forma aditiva, la tendencia no se incluye y la estacionalidad ingresa de forma multiplicativa.
+
+Entre sus principales características, se destaca por ser una solución muy simple, que es fácil de implementar y rápida de computar. Además, no requiere modelar explícitamente la interrupción, por lo que el modelo puede utilizarse para realizar pronósticos incluso si se desconoce el momento o el efecto de la interrupción.
+
+A continuación se presentan algunos de los ejemplos más conocidos de modelos ETS.
+
+Suavizado Exponencial Simple (SES) - ETS(A,N,N)
+
+El método de Suavizado Exponencial Simple resulta apropiado para la generación de pronósticos en series que no presentan tendencia ni estacionalidad definida. Los pronósticos se calculan mediante promedios ponderados de las observaciones pasadas, donde los pesos decrecen de manera exponencial conforme las observaciones se alejan en el tiempo, asignándole menor peso a los datos más antiguos. La expresión de la generación de pronósticos resulta:
+
+$$\hat{y}_{t}(1) = \alpha y_t + \alpha(1-\alpha)y_{t-1} + \cdots + \alpha(1-\alpha)^{t-1}y_1$${#eq-sesforec}
+
+donde $0 < \alpha < 1$.
+
+Una forma alternativa de representar el modelo es con la forma de componentes, para el suavizado exponencial simple, la única componente que se incluye es el nivel, denotado como $\ell_t$. Estas representaciones de lo métodos de suavizado exponencial comprenden una ecuación de pronóstico y una ecuación de suavizado para cada uno de los componentes incluidos en el método. La forma de componentes del suavizado exponencial simple viene dada por:
+
+- Ecuación de pronóstico: $\hat{y}_{t}(h) = \ell_t$
+- Ecuación de suavizado: $\ell_t = \alpha y_t + (1-\alpha)\ell_{t-1}$
+
+donde $\ell_t$ es el nivel (o el valor suavizado) de la serie en el tiempo $t$. Estableciendo $h=1$, se obtienen los valores ajustados, mientras que al establecer $t = T$, se obtienen los pronóstico reales, más allá de los datos de entrenamiento.
+
+Con respecto a la estimación de los parámetros, una opción puede ser elegir los valores de los parámetros de forma subjetiva (o en base a la experiencia previa). Sin embargo, una forma más fiable y objetiva de obtener valores para los paráemtros desconocidos es estimarlos a partir de los datos observados utilizando algún método de estimación, como puede ser mediante la minimización de la suma de cuadrados de los errores (SCE).
+
+Método lineal de Holt - ETS(A,A,N)
+
+El método lineal de Holt constituye una extensión del Suavizado exponencial simple, que permite pronósticar series temporales que presentan tendencia. Éste involucra una ecuación de pronóstico y dos ecuaciones de suavizado (una para el nivel y una para la tendencia):
+
+- Ecuación de pronóstico: $\hat{y}_{t}(h) = \ell_t + hb_t$
+- Ecuación de nivel: $\ell_t = \alpha y_t + (1-\alpha)(\ell_{t-1} + b_{t-1})$
+- Ecuación de tendencia: $b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)b_{t-1}$
+
+donde $\ell_t$ denota el nivel estimado de la serie en el tiempo $t$, $b_t$ representa una estimación de la tendencia (pendiente) de la serie en el tiempo $t$, $\alpha$ es el parámetro de suavizado para el nivel, $0 \leq \alpha \leq 1$, y $\beta^*$ es el parámetro de suavizado para la tendencia, $0 \leq \beta^* \leq 1$. 
+
+De forma análoga al Suavizado exponencial simple, la ecuación de nivel puede interpretarse como un promedio ponderado entre la observación actual $y_t$ y el pronóstico de un paso adelante obtenido en el tiempo anterior $(\ell_{t-1} + b_{t-1})$. Por otro lado, la ecuación de tendencia establece que $b_t$ es un promedio ponderado entre la variación estimada del nivel $(\ell_t - \ell_{t-1})$ y la estimación previa de la tendencia $b_{t-1}$.
+
+En este modelo, la función de pronóstico deja de ser constante y pasa a ser lineal en el horizonte de predicción. Es decir, el pronóstico a $h$ pasos se obtiene sumando al último nivel estimado $\ell_t$ el producto entre $h$ y la última estimación de la tendencia $b_t$. En consecuencia, los pronósticos resultan ser una función lineal creciente (o decreciente) en función del horizonte $h$.
+
+(Preguntar si se puede agregar los damped trend)
+
+Método aditivo de Holt-Winters - ETS(A,A,A)
+
+El método aditivo de Holt-Winters extiende el método lineal de Holt con el objetivo de incorporar explícitamente la estacionalidad en el pronóstico. Este método se compone de una ecuación de pronóstico y tres ecuaciones de suavizado (una para el nivel $\ell_t$, otra para la tendencia $b_t$ y la última para la estacionalidad $s_t$). A cada una de estas ecuaciones le corresponden los parámetros de suavizado $\alpha$, $\beta^*$ y $\gamma$, respectivamente.
+
+- Ecuación de pronóstico: $\hat{y}_{t}(h) = \ell_t + hb_t + s_{t+h-m(k+1)}$
+- Ecuación de nivel: $\ell_t = \alpha(y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1})$
+- Ecuación de tendencia: $b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)b_{t-1}$
+- Ecuación de estacionalidad: $\gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)s_{t-m}$
+
+donde $k$ es la parte entera de $\frac{h-1}{m}$, lo que garantiza que los índices estacionales utilizados en el pronóstico provengan del último año de la muestra y $m$ representa el período estacional.
+
+Aquí, la ecuación de nivel representa un promedio ponderado entre la observación desestacionalizada $(y_t - s_{t-m})$ y el pronóstico no estacional correspondiente al período $t$, dado por $(\ell_{t-1} + b_{t-1})$. La ecuación de tendencia coincide con el método lineal de Holt. Por su parte, la ecuación estacional expresa un promedio ponderado entre el índice estacional actual, $(y_t - \ell_{t-1} - b_{t-1})$, y el índice correspondiente a la misma estación del ciclo anterior.
+
+Los modelos presentados previamente permiten capturar distintas configuraciones estructurales de la serie, tales como nivel, tendencia y estacionalidad. Cabe aclarar que se pueden presentar muchas más combinaciones dependendiendo de como ingresa cada componente al modelo, si de forma aditiva, multiplicativa o no ingresando. 
+
+Con el fin de determinar la especificación más adecuada se utilizará la función `r model()` del paquete `r fabletools`, que permite hacer una selección automática del modelo ajustado, seleccionando aquel modelo que minimice el/los criterio/s de información $AICc$, $AIC$ o $BIC$. 
+
+Sin embargo, tal como señalan Hyndman y Rostami-Tabar (2024), los ETS presentan limitaciones ante *shocks* abruptos. En particular, necesitan un período de ajuste para que sus parámetros se estabilicen luego de una interrupción abrupta, lo que puede derivar en pronósticos inestables o con mayor variabilidad durante y después del evento.
+
+A pesar de ello, su simplicidad y adaptabilidad hacen que constituyan un componente valioso dentro del conjunto de estrategias para series interrumpidas, funcionando como una opción más simple a enfoques más estructurales o contrafactuales.
+
+## Modelos de intervención
+
+Los modelos de intervención están diseñados para describir y cuantificar el impacto de un evento externo en una serie temporal. Su propósito es identificar cómo, y en qué magnitud, se modifican los valores de la serie a partir de la ocurrencia de un hecho exógeno, permitiendo distinguir entre la evolución "natural" del proceso y los efectos atribuibles a dicho evento.
+
+La intervención puede estar asociada a la implementación de una política pública, la implementación de una política, programa o la ocurrencia de un evento disruptivo, como fue el caso de la pandemia de COVID-19. En tales contextos, la serie temporal puede experimentar quiebres estructurales que no pueden ser adecuadamente explicados mediante modelos de series temporales univariados tradicionales, lo que justifica la incorporación explícita de variables que representen el evento en cuestión. 
+
+\setlength{\parindent}{0pt}
+
+El enfoque clásico de intervención fue introducido por Box y Tiao (1975) y combina:
+
+1. un modelo de regresión, que incorpora variables explicativas para representar el efecto del *shock*, y
+2. un modelo ARIMA para los errores, que captura la dependencia temporal residual.
+
+La estructura general se expresa como:
+
+$$
+y_t = \beta_0 + \beta_1 \cdot x_{1,t} + \beta_2 \cdot x_{2,t} + \cdots + \beta_k \cdot x_{k,t} + \eta_t
+$$
+
+$$
+\phi_p(B) \nabla^d \eta_t = \theta_q(B) \varepsilon_t
+$${#eq-mint}
+
+donde $\eta_t$ representa el término de error del modelo de regresión y $\varepsilon_t$ representa el término de error del modelo ARIMA.
+
+Las variables de intervención pueden representar:
+
+- cambios permanentes en la estructura,
+- impactos transitorios,
+- procesos de lenta recuperación.
+
+\setlength{\parindent}{1.5em}
+
+La principal ventaja de estos modelos es que permiten incorporar explícitamente la estructura causal del evento y pronosticar disrupciones futuras similares. No obstante, diferenciar entre una verdadera disrupción y un factor determinante más general como un cambio tendencial, puede introducir cierto grado de subjetividad en el análisis.
+
+En el marco conceptual de Hyndman y Rostami-Tabar (2024), los modelos de intervención constituyen la estrategia “estructural”, en la cual la disrupción se modela directamente como parte del proceso generador de datos.
+
+## Métodos contrafactuales
+
+Los métodos contrafactuales abordan el problema desde una perspectiva distinta: en lugar de intentar modelar directamente el efecto del *shock*, se orientan a reconstruir cómo habría evolucionado la serie en ausencia del evento disruptivo. Esto permite generar pronósticos menos contaminados por valores extremos y evaluar escenarios alternativos.
+
+### Establecer como faltante (*set to missing*)
+
+En este enfoque, todas las observaciones del período disruptivo se reemplazan por valores faltantes. El modelo se ajusta utilizando únicamente los datos previos y posteriores al *shock*, evitando que las observaciones durante el período disruptivo influyan en la estimación de parámetros.
+
+Es importante destacar que los pronósticos generados para el período de disrupción no serán precisos, pero pueden interpretarse como escenarios contrafactuales. Por otro lado, los pronósticos posteriores a la disrupción tienden a ser más estables, dado que no se ven afectados por observaciones atípicas o ruidosas.
+
+A pesar de que muchos modelos de series de tiempo tienen problemas con los datos faltantes, algunos enfoques pueden tratarlos adecuadamente. Wu, Chang y Lee (2015) sugieren una estrategia de pronósticos basados en LSSVM (*Least Squares Support Vector Machine*) que fue particularmente diseñado para trabajar con series temporales con datos faltantes.
+
+La incorporación de valores faltantes incrementa la incertidumbre del modelo, dando lugar a intervalos de predicción más amplios. Esta característica señalada por Hyndman y Rostami-Tabar (2024), puede resultar beneficiosa desde una perspectiva interpretativa, ya que refleja de manera realista la falta de información confiable durante los períodos disruptivos.
+
+### Lo que podría haber ocurrido (*what might have been*)
+
+Este enfoque reconstruye el período de interrupción utilizando únicamente información del período previo a la interrupción. Las estrategias se basan en:
+
+- utilizar los datos del periodo pre-disruptivo para estimar un modelo (ARIMA, ETS, etc), para luego obtener las observaciones estimadas durante el período disruptivo.
+
+- utilizar los datos del período pre-disruptivo para estimar las observaciones durante el período disruptivo haciendo uso de alguna medida resumen (media, mediana, entre otras).
+
+En esta estrategia, los valores estimados durante la interrupción no constituyen pronósticos genuinos en sentido estricto, ya que se habrán utilizado información futura para calcular los datos ajustados durante la interrupción. Sin embargo, los pronósticos posteriores a la interrupción sí serán pronósticos verdaderos y deberían ser prácticamente iguales a los obtenidos con la estrategia anterior (*set to missing*).
+
+## Métodos de combinación (*ensemble*)
+
+Los métodos de combinación, o *ensembles*, consisten en integrar múltiples modelos para producir un pronóstico final que aproveche las fortalezas de cada uno. Su fundamento teórico se basa en que diferentes modelos capturan distintas fuentes de información parcial sobre el problema, que se superponen de forma incompleta y, por lo tanto, se complementan entre sí.
+
+Hendry y Clements (2004) demostraron que el *ensemble* puede ser visto como una aplicación del estimador de *Stein-James*, donde el valor futuro desconocido funciona como un meta-parámetro cuya estimación mejora al promediar distintas fuentes de información parcial.
+
+En el contexto de series interrumpidas, Hyndman y Rostami-Tabar (2024) destacan que los *ensembles* son especialmente valiosos porque permiten combinar:
+
+- modelos tradicionales (ARIMA/SARIMA),
+- modelos de intervención,
+- modelos altamente adaptativos (ETS),
+- modelos contrafactuales.
+
+Esta integración elimina la inestabilidad que presentan algunos métodos en la fase del *shock* o en la recuperación temprana.
+
+La forma de *ensemble* utilizada en esta tesina será la combinación lineal simple, expresada como:
+
+$$\tilde{y}_{T+h|T} = \sum_{i=1}^{N} w_{T+h|T, i} \cdot \hat{y}_{T+h|T, i}$${#eq-ensemble}
+
+\setlength{\parindent}{0pt}
+
+donde $\tilde{y}_{T+h|T}$ es el pronóstico del ensemble h pasos hacia adelante, $w_{T+h|T, i}$ el peso asignado al i-ésimo modelo de pronóstico, el cual es el mismo para todos los modelos y $\hat{y}_{T+h|T, i}$ es el i-ésimo modelo de pronóstico. 
+
+\setlength{\parindent}{1.5em}
+
+Diversos estudios han demostrado que, a pesar de su simplicidad, el promedio simple suele ser competitivo e incluso superar combinaciones más complejas, especialmente cuando los modelos individuales poseen desempeños heterogéneos ante las interrupciones.
+
+\newpage
+
+## Métricas de evaluación
+
+Con el fin de comparar el desempeño de los modelos propuestos, es necesario definir diversas métricas de evaluación. Estas métricas permiten analizar tanto la capacidad de ajuste como el desempeño predictivo puntual y la calidad de los intervalos de predicción de los distintos métodos.
+
+### Raíz del error cuadrático medio (RMSE)
+
+Es una medida directa del error de predicción en las mismas unidades que la variable de respuesta, representa la raíz cuadrada del promedio de las diferencias al cuadrado entre los valores observados y los valores predichos. Valores más pequeños indican buenos resultados. Su expresión resulta:
+
+$$RMSE(\hat{y}, y) = \sqrt{\frac{1}{n}\sum_{i=1}^{n} \left( y_i - \hat{y}_i \right)^2}$${#eq-rmse}
+
+\setlength{\parindent}{0pt}
+
+donde $y_i$ es el i-ésimo valor real, $\hat{y}_i$ es el i-ésimo valor pronosticado y $n$ es la cantidad de observaciones.
+
+\setlength{\parindent}{1.5em}
+
+### Error absoluto medio (MAE)
+
+Es una métrica que cuantifica la magnitud promedio de los errores en un conjunto de predicciones, sin considerar su dirección. Al centrarse únicamente en el tamaño de los errores, ayuda a identificar qué tan lejos están las predicciones de los resultados reales. Valores más pequeños indican buenos resultados. Su expresión resulta:
+
+$$MAE(\hat{y}, y) = \frac{1}{n}\sum_{i=1}^{n} \left| y_i - \hat{y}_i \right|$${#eq-mae}
+
+\setlength{\parindent}{0pt}
+
+donde $y_i$ es el i-ésimo valor real, $\hat{y}_i$ es el i-ésimo valor pronosticado y $n$ es la cantidad de observaciones.
+
+\setlength{\parindent}{1.5em}
+
+### Error porcentual absoluto medio (MAPE)
+
+Al igual que el MAE, el MAPE es una métrica de precisión que mide la desviación promedio de un valor predicho respecto al valor observado, con la ventaja de ser más fácil de interpretar al no tener en cuenta la escala de medición. Valores más pequeños indican buenos resultados. Su expresión resulta:
+
+$$MAPE(\hat{y}, y) = \frac{1}{n}\sum_{i=1}^{n} \left| \frac{y_i - \hat{y}_i}{y_i} \right|$${#eq-mape}
+
+\setlength{\parindent}{0pt}
+
+donde $y_i$ es el i-ésimo valor real, $\hat{y}_i$ es el i-ésimo valor pronosticado y $n$ es la cantidad de observaciones.
+
+\setlength{\parindent}{1.5em}
+
+### Puntuación de Winkler (*Winkler Score*)
+
+Es una métrica que evalúa el intervalo de predicción de los modelos ajustados, si la observación cae dentro del intervalo de predicción su valor resulta en la amplitud del intervalo, mientras que si la observación cae fuera del intervalo de predicción a dicha amplitud se le sumará un término de penalización que es proporcional a cuán lejos la observación cae del intervalo. Valores más pequeños indican intervalos de predicción más estrechos. Su expresión resulta:
+
+$$W_{\alpha, t} = \left\{\begin{array}{ll} \left(u_{\alpha, t} - l_{\alpha, t}\right) + \frac{2}{\alpha}  \left(l_{\alpha, t} - y_t\right) & si \ y_t < l_{\alpha, t} \\ \left(u_{\alpha, t} - l_{\alpha, t}\right) & si \ l_{\alpha, t} \leq y_t \leq u_{\alpha, t} \\ \left(u_{\alpha, t} - l_{\alpha, t}\right) + \frac{2}{\alpha} \left(y_t - u_{\alpha, t}\right) & si \ y_t > u_{\alpha, t} \\ \end{array}\right.$${#eq-winkler}
+
+\setlength{\parindent}{0pt}
+
+donde $y_t$ es el valor observado en el tiempo $t$, $u_{\alpha, t}$ es el límite superior del intervalo de predicción en el tiempo $t$, $l_{\alpha, t}$ es el límite inferior del intervalo de predicción en el tiempo $t$ y $\alpha$ es el nivel de confianza establecido.
+
+\setlength{\parindent}{1.5em}
+
+Para la obtención de la puntuación anual, se calcula el promedio de las puntuaciones obtenidas, cuya expresión resulta:
+
+$$
+W_{\alpha} = \frac{1}{12} \cdot \sum_{t=1}^{12}W_{\alpha, t}
+$${#eq-winkler2}
+
+### Evaluación diferenciada por régimen temporal
+
+Dado que los eventos disruptivos producen cambios abruptos en la estructura temporal, la evaluación se realizará en tres segmentos, siguiendo el enfoque del artículo de Hyndman:
+
+1. Durante el shock (2020): se evalúa la capacidad de adaptación inmediata.
+
+2. Recuperación inmediata (2021–2022): se evalúa la velocidad con la que cada modelo retorna a un comportamiento estable.
+
+3. Horizontes extendidos (2023–2024): se evalúa estabilidad predictiva de mediano plazo.
+
+De este modo, es posible identificar no solo el mejor modelo en términos generales, sino también el método más adecuado para cada fase de la serie.
+
+\newpage
+
+# Aplicación
+
+La aplicación empírica se desarrollará sobre una serie mensual de movilidad urbana correspondiente al total de pasajeros transportados por el sistema de Transporte Urbano de Pasajeros (TUP) de la ciudad de Rosario, con cobertura desde enero de 2006 hasta diciembre de 2024, utilizando el *software* de programación R. 
+
+Se considerará como pasajeros transportados al total de viajes abonados mediante el sistema de cancelación, independientemente de la existencia de beneficios, subsidios o gratuidad. Esta definición permitirá trabajar con una medida homogénea y comparable en el tiempo, estrictamente asociada al volumen real de demanda del sistema.
+
+La serie analizada presenta las siguientes características relevantes:
+
+- Muestra estacionalidad marcada particularmente en los meses asociados a las vacaciones de verano (diciembre, enero y febrero) y de invierno (julio), y una tendencia negativa a través de los años.
+
+- Registra un conjunto de observaciones atípicas durante los años 2020 y 2021, consecuencia directa de las restricciones sanitarias impuestas por la pandemia de COVID-19 (evento disruptivo), así como una recuperación no lineal e incompleta en comparación con los niveles pre-pandemia.
+
+Estas características convierten a la serie en un caso adecuado para evaluar y comparar metodologías de pronóstico diseñadas para series interrumpidas. En particular, permiten analizar la capacidad de los distintos enfoques para adaptarse a cambios estructurales abruptos y generar pronósticos confiables en contextos de alta incertidumbre.
+
+El procedimiento de aplicación se estructurará de acuerdo con los siguientes pasos:
+
+- Preprocesamiento de los datos: Se llevará a cabo un proceso riguroso de limpieza y transformación de los datos, utilizando herramientas provistas por los paquetes `tidyverse` y `lubridate`.
+
+- Análisis de las características de la serie: Se examinarán las propiedades intrínsecas de la serie, incluyendo la identificación de tendencia, estacionalidad y período donde ocurre la disrupción, a través de herramientas visuales implementadas con la librería `ggplot2`.
+
+- Modelización y análisis del shock pandémico (2020) y de la etapa de recuperación (2021–2024): Se ajustarán los modelos previamente seleccionados para capturar y pronosticar esta transición, empleando las librerias del paquete `fpp3`.
+
+- Evaluación comparada de pronósticos: Se evaluará el desempeño de los diversos enfoques tanto durante la disrupción como en el período posterior, a través de métricas puntuales y probabilísticas, utilizando las librerias del paquete `fpp3`.
+
+El propósito de esta aplicación es, por un lado, ofrecer un análisis riguroso de la evolución de la movilidad urbana en la ciudad de Rosario a lo largo de casi dos décadas y, por otro, generar evidencia empírica sólida que permita identificar qué estrategias de modelización resultan más adecuadas para el tratamiento de series temporales interrumpidas, caracterizadas por *shocks* abruptos y procesos de recuperación graduales.
+
+Los resultados permitirán elaborar recomendaciones metodológicas aplicables a otros casos de series interrumpidas en contextos urbanos, económicos o de demanda de servicios públicos.
+
+
+\newpage
+
+# Bibliografía
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{10pt}   
+
+**Box, G. E. P., & Tiao, G. C. (1975).** Intervention analysis with applications to economic and environmental problems. *Journal of the American Statistical Association, 70*(349), 70–79.
+
+**Gardner, E. S. (2006).** Exponential smoothing: The state of the art — Part II. *International Journal of Forecasting, 22*, 637–666. [https://doi.org/10.1016/j.ijforecast.2006.03.005](https://doi.org/10.1016/j.ijforecast.2006.03.005)
+
+**Hendry, D. F., & Clements, M. P. (2004).** Pooling of forecasts. *The Econometrics Journal, 7*(1), 1–31.
+
+**Hyndman, R. J. (2014).** Measuring forecast accuracy. In *Business Forecasting: Practical Problems and Solutions*, 177–183.
+
+**Hyndman, R. J., & Rostami-Tabar, B. (2024).** Forecasting interrupted time series. *Journal of the Operational Research Society, 76*(4), 790–803. [https://doi.org/10.1080/01605682.2024.2395315](https://doi.org/10.1080/01605682.2024.2395315)
+
+**Hyndman, R. J., & Athanasopoulos, G. (2021).** *Forecasting: Principles and Practice* (3rd ed.). OTexts. [https://otexts.com/fpp3/](https://otexts.com/fpp3/)
+
+**Peña, D. (2005).** *Análisis de series temporales*  Alianza Editorial.
+
+**Wang, X., Hyndman, R. J., Li, F., & Kang, Y. (2023).** Forecast combinations: an over 50-year review. *International Journal of Forecasting, 39*(4), 1518–1547. [https://robjhyndman.com/publications/combinations/](https://robjhyndman.com/publications/combinations/)
+
+**Wei, W. W. S. (2006).** *Time Series Analysis: Univariate and Multivariate Methods* (2nd ed.). Pearson Education.
+
+**Wu, S.-F., Chang, C.-Y., & Lee, S.-J. (2015).** Time series forecasting with missing values. In *2015 1st International Conference on Industrial Networks and Intelligent Systems (INISCom)* (pp. 151–156). [https://doi.org/10.4108/icst.iniscom.2015.258269](https://doi.org/10.4108/icst.iniscom.2015.258269)
