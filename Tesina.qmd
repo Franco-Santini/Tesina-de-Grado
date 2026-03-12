@@ -125,7 +125,7 @@ $$\rho_k = \frac{Cov(y_t, y_{t+k})}{\sqrt{Var(y_t)}\sqrt{Var(y_{t+k})}} = \frac{
 
 donde $\rho_k$ es el coeficiente de autocorrelación para el rezago $k$, $y_t$ y $y_{t+k}$ son los valores de la serie en los tiempos $t$ y $t+k$ respectivamente y notar que $Var(y_{t}) = Var(y_{t+k}) = \gamma_0$.
 
-El coeficiente $\rho_k$ varía de -1 a 1. Si $rho_k$ esta cerca de 1 indica que los valores de la serie están altamente correlacionados con los valores rezagados en $k$ momentos. Si $rho_k$ está cerca de -1 indica que los valores de la serie están altamente correlacionados de forma negativa con los valores rezagados en $k$ momentos. Por último, si $\rho_k$ está cerca de 0 indica que no hay una correlación significativa entre los valores de la serie para ese rezago.
+El coeficiente $\rho_k$ varía de -1 a 1. Si $\rho_k$ esta cerca de 1 indica que los valores de la serie están altamente correlacionados con los valores rezagados en $k$ momentos. Si $rho_k$ está cerca de -1 indica que los valores de la serie están altamente correlacionados de forma negativa con los valores rezagados en $k$ momentos. Por último, si $\rho_k$ está cerca de 0 indica que no hay una correlación significativa entre los valores de la serie para ese rezago.
 
 #### Función de Autocorrelación Parcial
 
@@ -188,7 +188,9 @@ donde $y_t$ representa el valor observado, $\Phi_P(B^s) = (1- \Phi_1B^s - \cdots
 
 \setlength{\parindent}{1.5em}
 
-(Agregar como sección la identificación y selección del mejor modelo)
+(Agregar como sección la identificación)
+
+Con el objetivo de seleccionar la especificación más adecuada se utilizará la función `ARIMA()` del paquete `fable`, que permite realizar una selección automática del mejor modelo basandose en el algoritmo de Hyndman-Khandakar, el cuál combina test de raíz unitaria, minimización del criterio de información $AICc$ y la estimación mediante el método de máxima verosimilitud para obtener el modelo ARIMA adecuado. (Agrego como funciona el algoritmo?)
 
 Si bien los modelos ARIMA y SARIMA constituyen un punto de partida indispensable, presentan limitaciones importantes cuando la serie contiene eventos disruptivos abruptos. Bajo estas circunstancias, los parámetros estimados a partir de datos previos a la disrupción pueden no reflejar adecuadamente el comportamiento posterior. Asimismo, la adaptación del modelo al patrón estacional posterior puede ser lento o inestable.
 
@@ -266,7 +268,7 @@ Aquí, la ecuación de nivel representa un promedio ponderado entre la observaci
 
 Los modelos presentados previamente permiten capturar distintas configuraciones estructurales de la serie, tales como nivel, tendencia y estacionalidad. Cabe aclarar que se pueden presentar muchas más combinaciones dependendiendo de como ingresa cada componente al modelo, si de forma aditiva, multiplicativa o no ingresando. 
 
-Con el fin de determinar la especificación más adecuada se utilizará la función `r model()` del paquete `r fabletools`, que permite hacer una selección automática del modelo ajustado, seleccionando aquel modelo que minimice el/los criterio/s de información $AICc$, $AIC$ o $BIC$. 
+Con el fin de determinar la especificación más adecuada se utilizará la función `ETS()` del paquete `fable`, que permite hacer una selección automática del modelo ajustado, seleccionando aquel modelo que minimice el/los criterio/s de información $AICc$, $AIC$ o $BIC$. 
 
 Sin embargo, tal como señalan Hyndman y Rostami-Tabar (2024), los ETS presentan limitaciones ante *shocks* abruptos. En particular, necesitan un período de ajuste para que sus parámetros se estabilicen luego de una interrupción abrupta, lo que puede derivar en pronósticos inestables o con mayor variabilidad durante y después del evento.
 
@@ -315,7 +317,7 @@ Los métodos contrafactuales abordan el problema desde una perspectiva distinta:
 
 ### Establecer como faltante (*set to missing*)
 
-En este enfoque, todas las observaciones del período disruptivo se reemplazan por valores faltantes. El modelo se ajusta utilizando únicamente los datos previos y posteriores al *shock*, evitando que las observaciones durante el período disruptivo influyan en la estimación de parámetros.
+La técnica "*Set to Missing*" consiste en identificar el período de interrupción en la serie temporal y marcar esas observaciones como valores perdidos, para luego ajustar el modelo sólo con los datos disponibles fuera del período interrumpido. De este modo, el modelo no utiliza información contaminada por la interrupción y genera pronósticos que representan lo que habría ocurrido sin el evento disruptivo.
 
 Es importante destacar que los pronósticos generados para el período de disrupción no serán precisos, pero pueden interpretarse como escenarios contrafactuales. Por otro lado, los pronósticos posteriores a la disrupción tienden a ser más estables, dado que no se ven afectados por observaciones atípicas o ruidosas.
 
@@ -323,15 +325,19 @@ A pesar de que muchos modelos de series de tiempo tienen problemas con los datos
 
 La incorporación de valores faltantes incrementa la incertidumbre del modelo, dando lugar a intervalos de predicción más amplios. Esta característica señalada por Hyndman y Rostami-Tabar (2024), puede resultar beneficiosa desde una perspectiva interpretativa, ya que refleja de manera realista la falta de información confiable durante los períodos disruptivos.
 
+(Como puedo agregar el algoritmo establecido por wu, chang y lee?)
+
 ### Lo que podría haber ocurrido (*what might have been*)
 
-Este enfoque reconstruye el período de interrupción utilizando únicamente información del período previo a la interrupción. Las estrategias se basan en:
+Este enfoque reconstruye el período de interrupción utilizando únicamente información del período previo a la interrupción, simulando el comportamiento que probablemente habría tenido la serie temporal si la interrupción no hubiese ocurrido. La idea consiste en reemplazar las observaciones distorsionadas por el evento disruptivo por valores estimados que reflejen la dinámica histórica del proceso antes de la interrupción. Las estrategias para obtener estas estimaciones se basan en:
 
 - utilizar los datos del periodo pre-disruptivo para estimar un modelo (ARIMA, ETS, etc), para luego obtener las observaciones estimadas durante el período disruptivo.
 
 - utilizar los datos del período pre-disruptivo para estimar las observaciones durante el período disruptivo haciendo uso de alguna medida resumen (media, mediana, entre otras).
 
-En esta estrategia, los valores estimados durante la interrupción no constituyen pronósticos genuinos en sentido estricto, ya que se habrán utilizado información futura para calcular los datos ajustados durante la interrupción. Sin embargo, los pronósticos posteriores a la interrupción sí serán pronósticos verdaderos y deberían ser prácticamente iguales a los obtenidos con la estrategia anterior (*set to missing*).
+Una vez obtenidas estas estimaciones, los valores reconstruidos se incorporan a la serie y se ajusta un modelo sobre el conjunto completo de datos, permitiendo así realizar pronósticos posteriores a la interrupción con mayor estabilidad.
+
+Sin embargo, es importante notar que los valores estimados durante la interrupción no constituyen pronósticos genuinos en sentido estricto, ya que se habrán utilizado información futura para calcular los datos ajustados durante la interrupción. No obstante, los pronósticos posteriores a la interrupción sí serán pronósticos verdaderos y deberían ser prácticamente iguales a los obtenidos con la estrategia anterior (*set to missing*).
 
 ## Métodos de combinación (*ensemble*)
 
@@ -342,8 +348,8 @@ Hendry y Clements (2004) demostraron que el *ensemble* puede ser visto como una 
 En el contexto de series interrumpidas, Hyndman y Rostami-Tabar (2024) destacan que los *ensembles* son especialmente valiosos porque permiten combinar:
 
 - modelos tradicionales (ARIMA/SARIMA),
-- modelos de intervención,
 - modelos altamente adaptativos (ETS),
+- modelos de intervención,
 - modelos contrafactuales.
 
 Esta integración elimina la inestabilidad que presentan algunos métodos en la fase del *shock* o en la recuperación temprana.
@@ -358,7 +364,9 @@ donde $\tilde{y}_{T+h|T}$ es el pronóstico del ensemble h pasos hacia adelante,
 
 \setlength{\parindent}{1.5em}
 
-Diversos estudios han demostrado que, a pesar de su simplicidad, el promedio simple suele ser competitivo e incluso superar combinaciones más complejas, especialmente cuando los modelos individuales poseen desempeños heterogéneos ante las interrupciones.
+Esta combinación lineal aporta robustez, atenúa los errores específicos de cada enfoque y suele superar a los métodos individuales, aunque puede quedar incompleto cuando los objetivos de los componentes difieren, como por ejemplo, predecir lo que ocurrió vs. lo que podría haber ocurrido.
+
+De todas formas, diversos estudios han demostrado que a pesar de su simplicidad, el promedio simple suele ser competitivo e incluso superar combinaciones más complejas, especialmente cuando los modelos individuales poseen desempeños heterogéneos ante las interrupciones.
 
 \newpage
 
@@ -380,7 +388,7 @@ donde $y_i$ es el i-ésimo valor real, $\hat{y}_i$ es el i-ésimo valor pronosti
 
 ### Error absoluto medio (MAE)
 
-Es una métrica que cuantifica la magnitud promedio de los errores en un conjunto de predicciones, sin considerar su dirección. Al centrarse únicamente en el tamaño de los errores, ayuda a identificar qué tan lejos están las predicciones de los resultados reales. Valores más pequeños indican buenos resultados. Su expresión resulta:
+Es una métrica que cuantifica la magnitud promedio de los errores en un conjunto de predicciones en las mismas unidades que la variable respuesta, sin considerar su dirección. Al centrarse únicamente en el tamaño de los errores, ayuda a identificar qué tan lejos están las predicciones de los resultados reales. Valores más pequeños indican buenos resultados. Su expresión resulta:
 
 $$MAE(\hat{y}, y) = \frac{1}{n}\sum_{i=1}^{n} \left| y_i - \hat{y}_i \right|$${#eq-mae}
 
@@ -394,7 +402,7 @@ donde $y_i$ es el i-ésimo valor real, $\hat{y}_i$ es el i-ésimo valor pronosti
 
 Al igual que el MAE, el MAPE es una métrica de precisión que mide la desviación promedio de un valor predicho respecto al valor observado, con la ventaja de ser más fácil de interpretar al no tener en cuenta la escala de medición. Valores más pequeños indican buenos resultados. Su expresión resulta:
 
-$$MAPE(\hat{y}, y) = \frac{1}{n}\sum_{i=1}^{n} \left| \frac{y_i - \hat{y}_i}{y_i} \right|$${#eq-mape}
+$$MAPE(\hat{y}, y) = \left(\frac{1}{n}\sum_{i=1}^{n} \left| \frac{y_i - \hat{y}_i}{y_i} \right|\right) \cdot 100\%$${#eq-mape}
 
 \setlength{\parindent}{0pt}
 
@@ -436,17 +444,33 @@ De este modo, es posible identificar no solo el mejor modelo en términos genera
 
 # Aplicación
 
+```{r source}
+source("Código/Funciones.R") # Cargas las funciones a utilizar
+```
+
+```{r datos transformados para las series}
+# Manipulación de los datos
+pasajeros <- pasajeros |> 
+  rename(date = ...1) |> 
+  mutate(pasajeros = pasajeros / 100000,
+         mes_anio = yearmonth(date),
+         Anio = year(date),
+         Mes = month(date))
+
+## Convertimos la serie en un objeto tsibble
+datos_series <- pasajeros |> 
+  mutate(Mes = as.numeric(Mes),
+         key = 1) |> 
+  dplyr::select(-date) |> 
+  as_tsibble(key = key,
+             index = mes_anio,
+             validate = T,
+             regular = T)
+```
+
 La aplicación empírica se desarrollará sobre una serie mensual de movilidad urbana correspondiente al total de pasajeros transportados por el sistema de Transporte Urbano de Pasajeros (TUP) de la ciudad de Rosario, con cobertura desde enero de 2006 hasta diciembre de 2024, utilizando el *software* de programación R. 
 
-Se considerará como pasajeros transportados al total de viajes abonados mediante el sistema de cancelación, independientemente de la existencia de beneficios, subsidios o gratuidad. Esta definición permitirá trabajar con una medida homogénea y comparable en el tiempo, estrictamente asociada al volumen real de demanda del sistema.
-
-La serie analizada presenta las siguientes características relevantes:
-
-- Muestra estacionalidad marcada particularmente en los meses asociados a las vacaciones de verano (diciembre, enero y febrero) y de invierno (julio), y una tendencia negativa a través de los años.
-
-- Registra un conjunto de observaciones atípicas durante los años 2020 y 2021, consecuencia directa de las restricciones sanitarias impuestas por la pandemia de COVID-19 (evento disruptivo), así como una recuperación no lineal e incompleta en comparación con los niveles pre-pandemia.
-
-Estas características convierten a la serie en un caso adecuado para evaluar y comparar metodologías de pronóstico diseñadas para series interrumpidas. En particular, permiten analizar la capacidad de los distintos enfoques para adaptarse a cambios estructurales abruptos y generar pronósticos confiables en contextos de alta incertidumbre.
+Esta misma contiene una serie de características que la convierten en un caso adecuado para evaluar y comparar metodologías de pronóstico diseñadas para series interrumpidas. En particular, permiten analizar la capacidad de los distintos enfoques para adaptarse a cambios estructurales abruptos y generar pronósticos confiables en contextos de alta incertidumbre.
 
 El procedimiento de aplicación se estructurará de acuerdo con los siguientes pasos:
 
@@ -460,8 +484,128 @@ El procedimiento de aplicación se estructurará de acuerdo con los siguientes p
 
 El propósito de esta aplicación es, por un lado, ofrecer un análisis riguroso de la evolución de la movilidad urbana en la ciudad de Rosario a lo largo de casi dos décadas y, por otro, generar evidencia empírica sólida que permita identificar qué estrategias de modelización resultan más adecuadas para el tratamiento de series temporales interrumpidas, caracterizadas por *shocks* abruptos y procesos de recuperación graduales.
 
-Los resultados permitirán elaborar recomendaciones metodológicas aplicables a otros casos de series interrumpidas en contextos urbanos, económicos o de demanda de servicios públicos.
+## Análisis descriptivo
 
+La serie en estudio corresponde al número de pasajeros transportados de forma mensual por el sistema de Transporte Urbano de Pasajeros (TUP) en la ciudad de Rosario. (Fuente de los datos).
+
+Se considerará como pasajeros transportados al total de viajes abonados mediante el sistema de cancelación, independientemente de la existencia de beneficios, subsidios o gratuidad. Esta definición permitirá trabajar con una medida homogénea y comparable en el tiempo, estrictamente asociada al volumen real de demanda del sistema. 
+
+En la @fig-serie1 se puede observar que la serie en estudio registra un conjunto de observaciones atípicas durante los años 2020 y 2021, consecuencia directa de las restricciones sanitarias impuestas por la pandemia de COVID-19 (evento disruptivo), así como una recuperación no lineal e incompleta en comparación con los niveles pre-pandemia.
+
+Por otro lado, la @fig-serie2 presenta una estacionalidad marcada particularmente en los meses asociados a las vacaciones de verano (diciembre, enero y febrero) y de invierno (julio), y una tendencia negativa a través de los años, esto puede ser una consecuencia directa de la pandemia de COVID-19.
+
+```{r graf 1}
+#| label: fig-serie1
+#| fig-cap: "Pasajeros transportados por el sistema de Transporte Urbano de Pasajeros en la ciudad de Rosario. Período 01/2006-12/2024."
+#| fig-height: 2.7
+#| fig-width: 7
+
+g1_evol_serie(datos_series)
+```
+
+```{r graf 2}
+#| label: fig-serie2
+#| fig-cap: "Cantidad de pasajeros transportados por el sistema de Transporte Urbano de Pasajeros en la ciudad de Rosario por año."
+#| fig-height: 2.8
+#| fig-width: 7
+
+g3_estacionalidad_anual(datos_series) + theme(
+  legend.spacing.y = unit(0.05, "cm"),
+  legend.text = element_text(size = 7),
+  legend.title = element_text(size = 9),
+  legend.key.height = unit(0.25, "cm")
+)
+```
+
+Con respecto al análisis de dispersión, se puede identificar en la @fig-serie3 una leve tendecia decreciente en la media y que la variabilidad no parece ser constante año a año. Estos patrones dan un indicio de que la serie no es estacionaria. Para solucionar la falta de estacionariedad en variancia, se transforma la variable utilizando la transformación de Box-Cox, el valor de $\lambda = 0$ fue obtenido a partir de minimizar el coeficiente de variación en la @tbl-bc, por lo que la transformación que se utilizó fue $y^{(\lambda)} = ln(y)$.
+
+```{r graf 3}
+#| label: fig-serie3
+#| fig-cap: "Distribución anual de pasajeros transportados por el sistema de Transporte Urbano de Pasajeros en la ciudad de Rosario."
+#| fig-height: 4
+#| fig-width: 7
+
+g2_boxplot_disp(datos_series)
+```
+
+```{r}
+bc_transf <- boxcox(lm(data = datos_series, pasajeros ~ 1), plotit = F)
+
+
+# Coeficientes de variación
+# Con esto solo aplicamos las transformaciones 
+# lambda = 2 implica y^2
+# lambda = 1 implica y (no se transforma)
+# lambda = 0.5 implica sqrt(y)
+# lambda = 0 implica ln(y)
+# lambda = -0.5 implica 1/sqrt(y)
+# lambda = -1 implica 1/y
+# lambda = -2 implica 1/y^2
+
+y_lambda2 <- datos_series$pasajeros^2
+y_lambda05 <- sqrt(datos_series$pasajeros)
+y_lambda0 <- log(datos_series$pasajeros)
+y_lambda.05 <- 1/sqrt(datos_series$pasajeros)
+y_lambda.1 <- 1/datos_series$pasajeros
+y_lambda.2 <- 1/(datos_series$pasajeros^2)
+
+bc <- data.frame(
+  lambda = c(-2, -1, -0.5, 0, 0.5, 1, 2),
+  Coeficiente_de_variacion = c(sd(y_lambda.2)/mean(y_lambda.2), sd(y_lambda.1)/mean(y_lambda.1), sd(y_lambda.05)/mean(y_lambda.05), sd(y_lambda0)/mean(y_lambda0), sd(y_lambda05)/mean(y_lambda05), sd(datos_series$pasajeros)/mean(datos_series$pasajeros), sd(y_lambda2)/mean(y_lambda2))
+)
+```
+
+```{r}
+#| label: tbl-bc
+#| tbl-cap: "Coeficiente de variación"
+
+bc |> 
+  kable(digits = 4, col.names = c("$\\lambda$", "Coeficiente de variación"))
+```
+
+Cabe destacar que, la @fig-serie4 muestra valores positivos elevados en los primeros rezagos, con un decrecimiento gradual a medida que aumenta el rezago, esto sugiere que la serie podría no ser estrictamente estacionaria. En estos casos, es habitual considerar la aplicación de diferenciación para estabilizar la media de la serie. 
+
+Asimismo, la @fig-serie5 presenta un pico significativo en el primer rezago y algunos rezagos adicionales con valores estadísticamente significativos, mientras que la mayoría de los rezagos posteriores se mantienen dentro de las bandas de confianza.
+
+
+```{r graf 4}
+#| label: fig-serie4
+#| fig-cap: "Función de autocorrelación muestral"
+#| fig-height: 3
+#| fig-width: 7
+
+g4_acf(datos_series, conf_limit = 0.95)
+```
+
+```{r}
+#| label: fig-serie5
+#| fig-cap: "Función de autocorrelación parcial muestral"
+#| fig-height: 3
+#| fig-width: 7
+
+g5_pacf(datos_series, conf_limit = 0.95)
+```
+
+
+\newpage
+
+## Ajuste de modelos
+
+\newpage
+
+## Resultados
+
+
+
+
+
+
+
+
+
+\newpage
+
+# Conclusión
 
 \newpage
 

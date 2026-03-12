@@ -5,6 +5,7 @@ library(fpp3)
 library(ggplot2)
 library(ggrepel)
 library(MASS) # Transformación Box-Cox
+library(kableExtra)
 
 # Lectura de la base de datos
 pasajeros <- readxl::read_excel("./Datos/solo pasajeros 2006-2024.xlsx")
@@ -15,9 +16,11 @@ g1_evol_serie <- function(df){
     ggplot() +
     aes(x = mes_anio, y = pasajeros) + 
     geom_line() +
-    geom_point(color = "dodgerblue2") +
-    labs(x = "Fecha", y = "Pasajeros") +
-    theme_bw()
+    geom_point(color = "dodgerblue2", size = 0.75) +
+    labs(x = "Año", y = "Pasajeros (cientos de miles)") +
+    scale_x_yearmonth(date_breaks = "1 year", date_labels = "%Y") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
 }
 
 g2_boxplot_disp <- function(df){
@@ -25,32 +28,21 @@ g2_boxplot_disp <- function(df){
     ggplot() +
     aes(x = Anio, y = pasajeros, group = Anio) +
     geom_boxplot(color = "black", fill = "dodgerblue2") +
-    theme_bw()
+    scale_x_continuous(breaks = 2006:2024, limits = c(2005.5, 2024.5)) +
+    labs(x = "Año", y = "Pasajeros (cientos de miles)") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
 }
 
 g3_estacionalidad_anual <- function(df){
   df |> 
-    ggplot() +
-    aes(x = Mes, y = pasajeros, group = Anio, color = factor(Anio)) +
-    geom_line() +
-    geom_text_repel(data = subset(df |> 
-                                    mutate(anio = factor(year(mes_anio)),
-                                           mes = factor(month(mes_anio))), mes == 1),
-                    aes(color = anio, label = anio),
-                    fontface = "bold",
-                    size = 2.5,
-                    # direction = "y",
-                    segment.size = 0,
-                    segment.alpha = 0,
-                    nudge_x = -0.25,
-                    box.padding = 0,
-                    force = 0.4
-    ) +
-    scale_x_discrete(limits = 1:12, labels = c("Ene", "Feb", "Mar", "Abr", "May", "Jun", 
-                                               "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")) +
-    labs(color = "Año") +
-    theme_bw() +
-    theme(legend.position = "none")
+    ggplot() + 
+    aes(x = Mes, y = pasajeros, group = Anio, color = factor(Anio)) + 
+    geom_line() + 
+    scale_x_discrete(limits = 1:12, 
+                     labels = c("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic")) + 
+    labs(color = "Año", x = "Mes", y = "Pasajeros (cientos de miles)") + 
+    theme_bw()
 }
 
 g4_acf <- function(df, conf_limit){
