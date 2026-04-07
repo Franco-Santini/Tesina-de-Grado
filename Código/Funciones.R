@@ -89,14 +89,19 @@ g5_pacf <- function(df, conf_limit){
     theme_bw()
 }
 
-g6_graf_pronosticos <- function(estrategia, anio, niv_conf){
+g6_graf_pronosticos <- function(estrategia, anio, niv_conf, color){
   df_filtrado <- datos_series |> filter(mes_anio <= yearmonth(paste("Dec", anio)))
   
   estrategia |> 
     filter(.id == paste("Pronóstico de", anio)) |> 
-    autoplot(level = niv_conf) +
+    autoplot(level = niv_conf, color = as.character(color)) +
     geom_line(data = df_filtrado, aes(y = pasajeros)) +
-    theme_bw()
+    guides(fill_ramp = guide_legend(title = "Intervalo de predicción")) +
+    labs(x = "Año", y = "Pasajeros (cientos de miles)") +
+    scale_x_yearmonth(date_breaks = "1 year", date_labels = "%Y") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1),
+          legend.position = "bottom")
 }
 
 # Creo funciones para el ajuste de los modelos
@@ -212,7 +217,7 @@ ensemble_sol5 <- function(object) {
     x |> as_tibble() |> mutate(.model = NULL)
   }) |> 
     bind_rows() |> 
-    mutate(pasajeros = generate(pasajeros, 2000)) |> 
+    mutate(pasajeros = generate(pasajeros, 5000)) |> 
     group_by(.id, mes_anio) |> 
     summarise(pasajeros = distributional::dist_sample(list(c(unlist(pasajeros))))) |> 
     ungroup() |> 
