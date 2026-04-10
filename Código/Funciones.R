@@ -106,14 +106,19 @@ g6_graf_pronosticos <- function(estrategia, anio, niv_conf, color){
 
 # Creo funciones para el ajuste de los modelos
 arima_ets_sol1 <- function(df){
-  df |> 
+  modelos <- df |>
     stretch_tsibble(.step = 12, .init = 168) |> 
     model(
       ets = ETS(log(pasajeros), ic = c("aicc", "aic", "bic")),
       arima = ARIMA(log(pasajeros))
-    ) |> 
+    )
+  
+  pronostico <- modelos |> 
     forecast(h = 12) |> 
     mutate(.id = paste("Pronóstico de", .id + 2019))
+  
+  list(modelos = modelos,
+       pronostico = pronostico)
 }
 
 m_int_sol2 <- function(df){
@@ -144,7 +149,9 @@ m_int_sol2 <- function(df){
     dplyr::select(.id, arima)
   
   # Creamos el objeto fable
-  bind_rows(
+  modelos <- ajustes_final
+  
+  pronostico <- bind_rows(
     ajustes_final |> filter(.id == 1) |> m_int_sol2_fc(h = 12),
     ajustes_final |> filter(.id == 2) |> m_int_sol2_fc(h = 12),
     ajustes_final |> filter(.id == 3) |> m_int_sol2_fc(h = 12),
@@ -156,6 +163,9 @@ m_int_sol2 <- function(df){
       index = mes_anio, key = c(.id, .model), response = "pasajeros", distribution = pasajeros
     ) |> 
     mutate(.id = paste("Pronóstico de", .id + 2019))
+  
+  list(modelos = modelos,
+       pronostico = pronostico)
 }
 
 m_int_sol2_fc <- function(fit, h = h){
@@ -173,16 +183,22 @@ m_int_sol2_fc <- function(fit, h = h){
 }
 
 stm_sol3 <- function(df){
-  df |> 
+  modelos <- df |> 
     stretch_tsibble(.step = 12, .init = 168) |>
     mutate(
       pasajeros = if_else((mes_anio >= yearmonth("2020 mar") & mes_anio <= yearmonth("2021 jul")), NA_real_, pasajeros)
     ) |> 
     model(
       arima = ARIMA(log(pasajeros))
-    ) |> 
+    )
+  
+  
+  pronostico <- modelos |> 
     forecast(h = 12) |> 
     mutate(.id = paste("Pronóstico de", .id + 2019))
+  
+  list(modelos = modelos,
+       pronostico = pronostico)
 }
 
 wmhb_sol4 <- function(df){
@@ -203,13 +219,18 @@ wmhb_sol4 <- function(df){
     dplyr::select(-ave)
   
   # Se ajusta el modelo en los distintos períodos
-  datos_series_wmhb |> 
+  modelos <- datos_series_wmhb |> 
     stretch_tsibble(.step = 12, .init = 168) |> 
     model(
       arima = ARIMA(log(pasajeros))
-    ) |> 
+    )
+  
+  pronostico <- modelos |> 
     forecast(h = 12) |> 
     mutate(.id = paste("Pronóstico de", .id + 2019))
+  
+  list(modelos = modelos,
+       pronostico = pronostico)
 }
 
 ensemble_sol5 <- function(object) {
@@ -222,6 +243,28 @@ ensemble_sol5 <- function(object) {
     summarise(pasajeros = distributional::dist_sample(list(c(unlist(pasajeros))))) |> 
     ungroup() |> 
     as_fable(index = mes_anio, key = .id,
-             response = "Pasajeros", distribution = pasajeros) |> 
+             response = "pasajeros", distribution = pasajeros) |> 
     suppressWarnings()
+}
+
+# Evaluacion de los resultados
+resultados <- function(ajuste, anio, conf_level){
+  
+  metricas_punt <- ajuste |> 
+    filter(.id == paste("Pronóstico de", anio)) |> 
+    accuracy(datos_series |> filter(Anio == anio)) |> 
+    dplyr::select(.model, RMSE:MAPE) |> 
+    dplyr::select(-MPE)
+  
+  metricas_int <- ajuste |> 
+    filter(.id == paste("Pronóstico de", anio)) |> 
+    accuracy(datos_series |> filter(Anio == anio), 
+             list(winkler = winkler_score), level = conf_level) |> 
+    dplyr::select(.model, winkler)
+  
+  metricas <- metricas_punt |> 
+    left_join(metricas_int, by = ".model") |> 
+    mutate(pronostico = rep(anio, times = nrow(metricas_punt)))
+  
+  metricas
 }

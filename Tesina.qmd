@@ -657,8 +657,7 @@ conf.lims <- c(-1,1)*qnorm((1 + alpha)/2)/sqrt(autocorrelacion_dif$n.used)
 ```
 
 
-Al aplicar la transformación correspondiendo a la variable respuesta, se puede observar en la @fig-serie6 la evolución temporal del logaritmo natural de los pasajeros y la distribución anual del logaritmo de los pasajeros, en los cuales el rango de la variable es mucho menor y esto hace que la variable sea más estable en varianza. Analizando la variable en los años de interes, podemos observar que hasta el año 2019, la variable parece ser estable tanto en media como en varianza, pero posteriormente en los años siguientes, parece estabilizarse en varianza pero en media no, lo cual puede dar un indicio de diferenciar los datos a partir del año 2020. 
-
+Al aplicar la transformación correspondiendo a la variable respuesta, en la @fig-serie6 se presenta la evolución temporal del logaritmo natural de los pasajeros, junto con su distribución anual. Se observa que el rango de la variable se reduce considerablemente, lo que contribuye a una mayor estabilidad en la varianza. Al analizar el comportamiento de la serie en los años de interés, se observa que hasta el año 2019, la variable parece ser estable en varianza pero no en media. Este comportamiento sugiere la conveniencia de aplicar una diferenciación en la serie, como estrategia para solucionar la no estacionariedad en media.
 
 ```{r graf 6}
 #| label: fig-serie6
@@ -694,7 +693,7 @@ ajuste1 <- arima_ets_sol1(datos_series)
 ajuste2 <- m_int_sol2(datos_series)
 ajuste3 <- stm_sol3(datos_series)
 ajuste4 <- wmhb_sol4(datos_series)
-ajuste5 <- ensemble_sol5(list(ajuste1, ajuste2, ajuste3, ajuste4))
+ajuste5 <- ensemble_sol5(list(ajuste1$pronostico, ajuste2$pronostico, ajuste3$pronostico, ajuste4$pronostico))
 ```
 
 ```{r resultados ajustes}
@@ -707,6 +706,26 @@ Para ello, se estimaron los modelos anteriormente presentados, cuyos resultados 
 
 ### ARIMA/SARIMA
 
+Los modelos ARIMA/SARIMA fueron ajustados sobre la serie previamente transformada con el fin de capturar la dependencia temporal observada en el análisis exploratorio. En particular, se consideraron tanto componentes no estacionales como estacionales, permitiendo modelar adecuadamente la dinámica mensual de la serie.
+
+Dado que el análisis se realiza bajo un esquema de evaluación por ventanas móviles, los modelos estimados no son únicos, sino que varían en función del período de entrenamiento considerado. En este sentido, la @tbl-ajuste1 resume las especificaciones seleccionadas en cada una de las etapas analizadas. Cabe destacar que la amplitud de los intervalos de predicción en la fase de estabilización son muy amplios indicando alta incertidumbre en los modelos.
+
+```{r modelos_ajustados1}
+#| tbl-cap: "Modelos ajustados en cada fase"
+#| label: tbl-ajuste1
+
+data.frame(
+  entrenamiento = c("Hasta 2019", "Hasta 2020", "Hasta 2021", "Hasta 2022", "Hasta 2023"),
+  modelos = c("$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(1,1,3)(0,0,2)_{12}$", "$SARIMA(1,1,3)(0,0,2)_{12}$", "$SARIMA(1,1,3)(0,0,1)_{12}$", "$SARIMA(1,1,3)(0,0,2)_{12}$")
+) |> 
+  kable(col.names = c("Entrenamiento", "Modelos ajustados"))
+```
+
+En términos de desempeño predictivo, la @fig-pronostico1 presenta los pronósticos generados en cada una de las diferentes etapas. Durante el período del evento disruptivo (año 2020), se observa que el modelo estimado no logra predecir adecuadamente la magnitud de la caída de la serie. Esto se debe a que estos modelos se basan en la información histórica, por lo que tienden a extrapolar. 
+
+En la fase de recuperación inmediata (años 2021 y 2022), se aprecia una mejora progresiva en la capacidad predictiva. A medida que se incorporan observaciones correspondientes al período posterior al evento disruptivo, estos modelos comienzan a mejorar el ajuste, reflejando parcialmente el proceso de recuperación. Sin embargo, se observan desvíos de los valores reales de la serie, lo cual indica que la recuperación no es inmediata.
+
+Finalmente, en la etapa de estabilización (años 2023 y 2024), estos modelos muestran un desempeño  superior. En este período, la serie presenta un comportamiento más regular y predecible, lo que permite a los modelos ajustados capturar de manera más precisa su evolución. En particular, el pronóstico correspondiente al año 2024 exhibe un alto grado de concordancia con los valores reales, tanto en términos puntuales como en la cobertura de los intervalos de predicción.
 
 ```{r graf_pronosticos1}
 #| label: fig-pronostico1
@@ -720,16 +739,33 @@ Para ello, se estimaron los modelos anteriormente presentados, cuyos resultados 
 #|    - "Pronóstico año 2023"
 #|    - "Pronóstico año 2024"
 
-g6_graf_pronosticos(ajuste1 |> filter(.model == "arima"), 2020, 90, color = "#263D92")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "arima"), 2021, 90, color = "#263D92")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "arima"), 2022, 90, color = "#263D92")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "arima"), 2023, 90, color = "#263D92")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "arima"), 2024, 90, color = "#263D92")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "arima"), 2020, 80, color = "#263D92")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "arima"), 2021, 80, color = "#263D92")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "arima"), 2022, 80, color = "#263D92")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "arima"), 2023, 80, color = "#263D92")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "arima"), 2024, 80, color = "#263D92")
 ```
 
 \newpage
 
 ### ETS
+
+Los modelos ETS ajustados sobre la serie transformada en cada etapa corresponden a los especificados en la @tbl-ajuste2. Estas especificaciones permiten capturar la evolución del nivel, la tendencia y la estacionalidad de la serie, adaptándose a las distintas fases del período analizado.
+
+```{r modelos_ajustados2}
+#| tbl-cap: "Modelos ajustados en cada etapa"
+#| label: tbl-ajuste2
+
+data.frame(
+  entrenamiento = c("Hasta 2019", "Hasta 2020", "Hasta 2021", "Hasta 2022", "Hasta 2023"),
+  modelos = c("$ETS(M,A,A)$", "$ETS(A,N,A)$", "$ETS(A,N,A)$", "$ETS(A,N,A)$", "$ETS(A,N,A)$")
+) |> 
+  kable(col.names = c("Entrenamiento", "Modelos ajustados"))
+```
+
+A diferencia de los modelos ARIMA/SARIMA, los modelos ETS presentan una mayor capacidad de adaptación frente a cambios repentinos en la dinámica de la serie. Este comportamiento se evidencia en la @fig-pronostico2, donde se observa que, si bien durante el período del *shock* los pronósticos resultan similares a los obtenidos mediante modelos ARIMA/SARIMA, en la fase de recuperación inmediata los modelos ETS logran ajustarse con mayor rapidez a la nueva estructura de la serie, lo que se traduce en una mejora sustancial en la calidad de los pronósticos, reflejando una capacidad superior para capturar la recuperación gradual de la serie.
+
+Por último, en la fase de estabilización, los pronósticos generados por estos modelos se ubican próximos a los valores reales, lo que indica un buen desempeño en términos de ajuste global. Sin embargo, se observa la presencia de una mayor incertidumbre asociada a las predicciones, reflejada en la amplitud de los intervalos de pronóstico.
 
 ```{r graf_pronosticos2}
 #| label: fig-pronostico2
@@ -743,15 +779,24 @@ g6_graf_pronosticos(ajuste1 |> filter(.model == "arima"), 2024, 90, color = "#26
 #|    - "Pronóstico año 2023"
 #|    - "Pronóstico año 2024"
 
-g6_graf_pronosticos(ajuste1 |> filter(.model == "ets"), 2020, 90, color = "#E47E11")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "ets"), 2021, 90, color = "#E47E11")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "ets"), 2022, 90, color = "#E47E11")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "ets"), 2023, 90, color = "#E47E11")
-g6_graf_pronosticos(ajuste1 |> filter(.model == "ets"), 2024, 90, color = "#E47E11")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "ets"), 2020, 80, color = "#E47E11")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "ets"), 2021, 80, color = "#E47E11")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "ets"), 2022, 80, color = "#E47E11")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "ets"), 2023, 80, color = "#E47E11")
+g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "ets"), 2024, 80, color = "#E47E11")
 ```
 \newpage
 
 ### Modelos de intervención
+
+Estos modelos requieren de la definición de una variable explicativa que haga referencia a la intervención que estamos estudiando, en este caso, la situación vivida en el país debido a la pandemia de COVID-19. Para ello, definimos como variable explicativa a la siguiente: 
+
+$$x_t = \left\{\begin{matrix}
+0 & \text{si} \ t \notin \ \text{Marzo 2020 - Julio 2021} \\
+1 & \text{si} \ t \in \ \text{Marzo 2020 - Julio 2021} \\
+\end{matrix}\right.$${#eq-varindicadora}
+
+Dicha variable indicadora, se estableció de esta forma por la drástica baja de la utilización de este servicio público debido a el Aislamiento Social, Preventivo y Obligatorio (ASPO) establecido en Argentina a partir del 20 de marzo del 2020 
 
 ```{r graf_pronosticos3}
 #| label: fig-pronostico3
@@ -765,21 +810,22 @@ g6_graf_pronosticos(ajuste1 |> filter(.model == "ets"), 2024, 90, color = "#E47E
 #|    - "Pronóstico año 2023"
 #|    - "Pronóstico año 2024"
 
-g6_graf_pronosticos(ajuste2, 2020, 90, color = "#AE00B8")
-g6_graf_pronosticos(ajuste2, 2021, 90, color = "#AE00B8")
-g6_graf_pronosticos(ajuste2, 2022, 90, color = "#AE00B8")
-g6_graf_pronosticos(ajuste2, 2023, 90, color = "#AE00B8")
-g6_graf_pronosticos(ajuste2, 2024, 90, color = "#AE00B8")
+g6_graf_pronosticos(ajuste2$pronostico, 2020, 80, color = "#AE00B8")
+g6_graf_pronosticos(ajuste2$pronostico, 2021, 80, color = "#AE00B8")
+g6_graf_pronosticos(ajuste2$pronostico, 2022, 80, color = "#AE00B8")
+g6_graf_pronosticos(ajuste2$pronostico, 2023, 80, color = "#AE00B8")
+g6_graf_pronosticos(ajuste2$pronostico, 2024, 80, color = "#AE00B8")
 ```
 \newpage
 
 ### Métodos contrafactuales
 
+#### Establecer como faltante (*set to missing*)
 ```{r graf_pronosticos4}
 #| label: fig-pronostico4
 #| layout-nrow: 3
 #| layout-ncol: 2
-#| fig-cap: "Pronósticos utilizando STM"
+#| fig-cap: "Pronósticos utilizando la estrategia 'establecer como faltante'"
 #| fig-subcap: 
 #|    - "Pronóstico año 2020"
 #|    - "Pronóstico año 2021"
@@ -787,18 +833,22 @@ g6_graf_pronosticos(ajuste2, 2024, 90, color = "#AE00B8")
 #|    - "Pronóstico año 2023"
 #|    - "Pronóstico año 2024"
 
-g6_graf_pronosticos(ajuste3, 2020, 90, color = "#E51010")
-g6_graf_pronosticos(ajuste3, 2021, 90, color = "#E51010")
-g6_graf_pronosticos(ajuste3, 2022, 90, color = "#E51010")
-g6_graf_pronosticos(ajuste3, 2023, 90, color = "#E51010")
-g6_graf_pronosticos(ajuste3, 2024, 90, color = "#E51010")
+g6_graf_pronosticos(ajuste3$pronostico, 2020, 80, color = "#E51010")
+g6_graf_pronosticos(ajuste3$pronostico, 2021, 80, color = "#E51010")
+g6_graf_pronosticos(ajuste3$pronostico, 2022, 80, color = "#E51010")
+g6_graf_pronosticos(ajuste3$pronostico, 2023, 80, color = "#E51010")
+g6_graf_pronosticos(ajuste3$pronostico, 2024, 80, color = "#E51010")
 ```
+
+\newpage 
+
+#### Lo que podría haber ocurrido (*what might have been*)
 
 ```{r graf_pronosticos5}
 #| label: fig-pronostico5
 #| layout-nrow: 3
 #| layout-ncol: 2
-#| fig-cap: "Pronósticos utilizando WMHB"
+#| fig-cap: "Pronósticos utilizando la estrategia 'lo que podría haber ocurrido'"
 #| fig-subcap: 
 #|    - "Pronóstico año 2020"
 #|    - "Pronóstico año 2021"
@@ -806,11 +856,11 @@ g6_graf_pronosticos(ajuste3, 2024, 90, color = "#E51010")
 #|    - "Pronóstico año 2023"
 #|    - "Pronóstico año 2024"
 
-g6_graf_pronosticos(ajuste4, 2020, 90, color = "#02A144")
-g6_graf_pronosticos(ajuste4, 2021, 90, color = "#02A144")
-g6_graf_pronosticos(ajuste4, 2022, 90, color = "#02A144")
-g6_graf_pronosticos(ajuste4, 2023, 90, color = "#02A144")
-g6_graf_pronosticos(ajuste4, 2024, 90, color = "#02A144")
+g6_graf_pronosticos(ajuste4$pronostico, 2020, 80, color = "#02A144")
+g6_graf_pronosticos(ajuste4$pronostico, 2021, 80, color = "#02A144")
+g6_graf_pronosticos(ajuste4$pronostico, 2022, 80, color = "#02A144")
+g6_graf_pronosticos(ajuste4$pronostico, 2023, 80, color = "#02A144")
+g6_graf_pronosticos(ajuste4$pronostico, 2024, 80, color = "#02A144")
 ```
 
 \newpage
@@ -829,11 +879,11 @@ g6_graf_pronosticos(ajuste4, 2024, 90, color = "#02A144")
 #|    - "Pronóstico año 2023"
 #|    - "Pronóstico año 2024"
 
-g6_graf_pronosticos(ajuste5, 2020, 90, color = "#E0BF00")
-g6_graf_pronosticos(ajuste5, 2021, 90, color = "#E0BF00")
-g6_graf_pronosticos(ajuste5, 2022, 90, color = "#E0BF00")
-g6_graf_pronosticos(ajuste5, 2023, 90, color = "#E0BF00")
-g6_graf_pronosticos(ajuste5, 2024, 90, color = "#E0BF00")
+g6_graf_pronosticos(ajuste5, 2020, 80, color = "#E0BF00")
+g6_graf_pronosticos(ajuste5, 2021, 80, color = "#E0BF00")
+g6_graf_pronosticos(ajuste5, 2022, 80, color = "#E0BF00")
+g6_graf_pronosticos(ajuste5, 2023, 80, color = "#E0BF00")
+g6_graf_pronosticos(ajuste5, 2024, 80, color = "#E0BF00")
 ```
 
 \newpage
@@ -841,16 +891,325 @@ g6_graf_pronosticos(ajuste5, 2024, 90, color = "#E0BF00")
 ## Resultados
 
 
+```{r resultados df}
+resultados_arima_ets <- rbind(
+  resultados(ajuste1$pronostico, 2020, 80),
+  resultados(ajuste1$pronostico, 2021, 80),
+  resultados(ajuste1$pronostico, 2022, 80),
+  resultados(ajuste1$pronostico, 2023, 80),
+  resultados(ajuste1$pronostico, 2024, 80)
+)
+
+resultados_arima_ets <- resultados_arima_ets |> 
+  mutate(.model = rep(c("Arima", "ETS"), times = 5))
+
+resultados_mint <- rbind(
+  resultados(ajuste2$pronostico, 2020, 80),
+  resultados(ajuste2$pronostico, 2021, 80),
+  resultados(ajuste2$pronostico, 2022, 80),
+  resultados(ajuste2$pronostico, 2023, 80),
+  resultados(ajuste2$pronostico, 2024, 80)
+)
+
+resultados_mint <- resultados_mint |> 
+  mutate(.model = rep("Regresión dinámica", times = 5))
+
+resultados_stm <- rbind(
+  resultados(ajuste3$pronostico, 2020, 80),
+  resultados(ajuste3$pronostico, 2021, 80),
+  resultados(ajuste3$pronostico, 2022, 80),
+  resultados(ajuste3$pronostico, 2023, 80),
+  resultados(ajuste3$pronostico, 2024, 80)
+)
+
+resultados_stm <- resultados_stm |> 
+  mutate(.model = rep("STM", times = 5))
+
+resultados_wmhb <- rbind(
+  resultados(ajuste4$pronostico, 2020, 80),
+  resultados(ajuste4$pronostico, 2021, 80),
+  resultados(ajuste4$pronostico, 2022, 80),
+  resultados(ajuste4$pronostico, 2023, 80),
+  resultados(ajuste4$pronostico, 2024, 80)
+)
+
+resultados_wmhb <- resultados_wmhb |> 
+  mutate(.model = rep("WMHB", times = 5))
+
+ajuste5 <- ajuste5 |> 
+  mutate(.model = rep("Ensemble", times = nrow(ajuste5)))
+
+resultados_ensemble <- rbind(
+  resultados(ajuste5, 2020, 80),
+  resultados(ajuste5, 2021, 80),
+  resultados(ajuste5, 2022, 80),
+  resultados(ajuste5, 2023, 80),
+  resultados(ajuste5, 2024, 80)
+)
+
+resultados_unidos <- rbind(resultados_arima_ets, resultados_mint, resultados_stm, resultados_wmhb, resultados_ensemble) |> arrange(pronostico)
+```
+
+```{r resultados}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = RMSE, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line() +
+  labs(x = "Año de pronóstico", color = "Estrategia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
 
 
+```{r resultados2}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = MAE, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line() +
+  labs(x = "Año de pronóstico", color = "Estrategia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
 
+```{r resultados3}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = MAPE, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line() +
+  labs(x = "Año de pronóstico", color = "Estrategia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
 
+```{r resultados4}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = winkler, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line() +
+  labs(x = "Año de pronóstico", color = "Estrategia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
 
+```{r}
+#| tbl-cap: "Evaluación de los pronósticos para cada estrategia utilizada"
+#| layout-ncol: 1
+#| layout-nrow: 4
+#| tbl-subcap: 
+#|    - "RMSE"
+#|    - "MAE"
+#|    - "MAPE"
+#|    - "Puntuación de Winlker"
+
+resultados_unidos |> 
+  dplyr::select(.model, RMSE, pronostico) |> 
+  pivot_wider(names_from = pronostico, values_from = RMSE) |>
+  kable(col.names = c("Estrategia", "2020", "2021", "2022", "2023", "2024"), 
+        format = 'pipe', digits = 4)
+
+resultados_unidos |> 
+  dplyr::select(.model, MAE, pronostico) |> 
+  pivot_wider(names_from = pronostico, values_from = MAE) |>
+  kable(col.names = c("Estrategia", "2020", "2021", "2022", "2023", "2024"), 
+        format = 'pipe', digits = 4)
+
+resultados_unidos |> 
+  dplyr::select(.model, MAPE, pronostico) |> 
+  pivot_wider(names_from = pronostico, values_from = MAPE) |>
+  kable(col.names = c("Estrategia", "2020", "2021", "2022", "2023", "2024"), 
+        format = 'pipe', digits = 4)
+
+resultados_unidos |> 
+  dplyr::select(.model, winkler, pronostico) |> 
+  pivot_wider(names_from = pronostico, values_from = winkler) |>
+  kable(col.names = c("Estrategia", "2020", "2021", "2022", "2023", "2024"), 
+        format = 'pipe', digits = 4)
+```
 
 
 \newpage
 
 # Conclusión
+
+\newpage
+
+# Anexo
+
+Poner el link de github...
+
+
+```{r residuos modelos1}
+ajuste1$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos2}
+ajuste1$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+```{r residuos modelos3}
+ajuste1$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+
+```{r residuos modelos4}
+ajuste1$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos5}
+ajuste1$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos6}
+ajuste1$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(ets) |> 
+  gg_tsresiduals()
+```
+```{r residuos modelos7}
+ajuste1$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos8}
+ajuste1$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos9}
+ajuste1$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos10}
+ajuste1$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos11}
+ajuste2$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+```{r residuos modelos12}
+ajuste2$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+```{r residuos modelos13}
+ajuste2$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos14}
+ajuste2$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+```{r residuos modelos15}
+ajuste2$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos16}
+ajuste3$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+```{r residuos modelos17}
+ajuste3$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos18}
+ajuste3$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos19}
+ajuste3$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos20}
+ajuste3$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos21}
+ajuste4$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+```{r residuos modelos22}
+ajuste4$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos22}
+ajuste4$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos23}
+ajuste4$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
+
+```{r residuos modelos24}
+ajuste4$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  gg_tsresiduals()
+```
 
 \newpage
 
