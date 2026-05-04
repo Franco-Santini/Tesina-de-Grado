@@ -25,19 +25,19 @@ header-includes:
   - \onehalfspacing
 ---
 
-### Pagina de Agradecimientos
+\section*{Agradecimientos}
 
 \newpage
 
-### Resumen
+\section*{Resumen}
 
 \newpage
 
 # Introducción
 
-El análisis y pronóstico de series temporales constituyen herramientas fundamentales en diversas áreas aplicadas -como economía, salud, movilidad, transporte, energía, educación y políticas públicas- debido a su capacidad para describir la evolución de los fenómenos y anticipar escenarios futuros. Sin embargo, los métodos tradicionales suelen basarse en la suposición de estabilidad de los patrones históricos y de continuidad estructural. Este supuesto puede resultar problemático cuando las series se ven afectadas por eventos disruptivos que alteran la regularidad de su comportamiento.
+El análisis y pronóstico de series temporales constituyen herramientas fundamentales en diversas áreas aplicadas -como economía, salud, movilidad, transporte, energía, educación y políticas públicas- debido a su capacidad para describir la evolución de los fenómenos y anticipar escenarios futuros. Sin embargo, los métodos tradicionales suelen basarse en el supuesto de estabilidad de los patrones históricos y de continuidad estructural. Este supuesto puede resultar problemático cuando las series se ven afectadas por eventos disruptivos que alteran la regularidad de su comportamiento.
 
-Los *shocks* exógenos, tales como pandemias, reformas regulatorias o cambios en los comportamientos sociales, interrupciones en infraestructuras o eventos extraordinarios generan alteraciones significativas en las series temporales. En muchos casos, estos eventos se manifiestan a través de quiebres de nivel, cambios en la tendencia y la estacionalidad, observaciones atípicas extremas y procesos de recuperación no lineales. La irrupción simultánea de alguno de estos fenómenos desafía los supuestos y la capacidad de adaptación de la mayoría de los modelos clásicos, dificultando la obtención de pronósticos precisos, especialmente cuando se busca comprender el comportamiento inmediato posterior a la disrupción y la trayectoria de recuperación.
+Los *shocks* exógenos -tales como pandemias, reformas regulatorias, cambios en los comportamientos sociales, interrupciones en infraestructuras o eventos extraordinarios- generan alteraciones significativas en las series temporales. En muchos casos, estos eventos se manifiestan a través de quiebres de nivel, cambios en la tendencia y la estacionalidad, observaciones atípicas extremas y procesos de recuperación no lineales. La irrupción simultánea de alguno de estos fenómenos desafía los supuestos y la capacidad de adaptación de la mayoría de los modelos clásicos, dificultando la obtención de pronósticos precisos, especialmente cuando se busca comprender el comportamiento inmediato posterior a la disrupción y la trayectoria de recuperación.
 
 Un caso particularmente relevante, tanto en Argentina como a nivel mundial, es la pandemia de COVID-19. Durante el año 2020, esta produjo una alteración abrupta en las series de movilidad y transporte urbano: el volumen de pasajeros transportados cayó a mínimos históricos debido a las restricciones de circulación, seguido de una recuperación lenta y heterogénea a medida que las restricciones se fueron flexibilizando. Estas características convierten a las series de transporte y movilidad en un contexto adecuado para el análisis de metodologías robustas para el tratamiento de series temporalmente interrumpidas.
 
@@ -71,7 +71,7 @@ Evaluar, de manera comparativa, distintas metodologías de pronóstico aplicable
   
   - Reconstrucción del período mediante estimaciones de lo que podría haber sido ("*what might have been*").
 
-- Explorar combinaciones de modelos (*ensembles*) y evaluar si mejoran el desempeño.
+- Explorar combinaciones de modelos (*ensembles*) y evaluar su impacto en el desempeño predictivo.
 
 - Comparar todas las estrategias mediante métricas puntuales y probabilísticas (RMSE, MAE, MAPE y *Winkler Score*).
 
@@ -83,11 +83,11 @@ Evaluar, de manera comparativa, distintas metodologías de pronóstico aplicable
 
 \setlength{\parindent}{1.5em}
 
-En esta sección se presentan diversas estrategias para manejar interrupciones en el pronóstico de series temporales. El tratamiento de interrupciones en series de tiempo constituye un problema complejo y multifacético, y la elección de la estrategia más adecuada depende de las características específicas de los datos y de la naturaleza de la interrupción. Por ello, en la presente tesina se proponen múltiples estrategias en lugar de un único enfoque, con el fin de abordar de manera efectiva distintas situaciones y casos.
+En esta sección se presentan diversas estrategias para manejar interrupciones en el pronóstico de series temporales. El tratamiento de interrupciones en series de tiempo constituye un problema complejo y multifacético, y la elección de la estrategia más adecuada depende de las características específicas de los datos y de la naturaleza de la interrupción. Por esta razón, en la presente tesina se adoptan múltiples estrategias en lugar de un único enfoque, con el fin de abordar de manera efectiva distintas situaciones y casos.
 
 ## Conceptos básicos de series de tiempo
 
-Una serie de tiempo es una secuencia de observaciones ordenadas de una variable objetivo a lo largo del tiempo en intervalos regulares (cada día, cada mes, cada año, etc.). La naturaleza intrínseca de las series temporales es que sus observaciones son dependientes o correlacionadas, y por lo tanto, el orden de las observaciones es importante. Por esta razón, ciertos procedimientos o técnicas que se basan en el supuesto de independencia no son aplicables y se necesitan de diferentes métodos. 
+Una serie de tiempo es una secuencia de observaciones ordenadas de una variable objetivo a lo largo del tiempo en intervalos regulares (cada día, cada mes, cada año, etc.). La naturaleza intrínseca de las series temporales es que sus observaciones son dependientes o correlacionadas, y por lo tanto, el orden de las observaciones es importante. Por esta razón, los procedimientos basados en el supuesto de independencia no resultan aplicables, lo que requiere el uso de metodologías específicas para series temporales. 
 
 Formalmente, un proceso estocástico es un conjunto de variables aleatorias ${y_t}$ donde el índice $t$ toma valores en un cierto conjunto $C$. En nuestro caso, este conjunto es ordenado y corresponde a los instantes temporales (días, meses, años, etc.). Para cada valor $t$ del conjunto $C$, es decir, para cada instante temporal, está definida una variable aleatoria $y_t$, y los valores observados de las variables aleatorias en distintos instantes forman una serie temporal. Por lo tanto, una serie de tiempo de $T$ datos, $(y_1, y_2, ..., y_T)$, es una muestra de tamaño uno del vector de $T$ variables aleatorias ordenadas en el tiempo correspondientes a los momentos $t = 1,...,T$, y la serie observada se considera una realización del proceso estocástico. 
 
@@ -109,11 +109,11 @@ En el análisis de series temporales, es importante determinar si una serie es e
 
 \setcounter{equation}{3}
 
-Las dos primeras condiciones indican que la media y la variancia son constantes. La tercera, que la covariancia entre dos variables depende sólo de su separación. 
+Las dos primeras condiciones indican que la media y la varianza son constantes. La tercera, que la covarianza entre dos variables depende sólo de su separación. 
 
-Por otro lado, diremos que una serie es no estacionaria si la media, la variancia y la covariancia no son constantes a través del tiempo. Una forma de solucionar la no estacionariedad en media es tomando una cantidad adecuada de diferencias de la serie, es decir, si la serie $\{y_t\}$ es no estacionaria y tomamos una cantidad $d$ de diferencias se obtiene una nueva serie $\{(1-B)^dy_t\}$ para algún entero $d \geq 1$, que es estacionaria. Para determinar cuantas diferenciaciones hay que realizarle a la serie se puede realizar por inspección de algún gráfico de la función de autocorrelación o bien realizar alguna prueba de hipótesis, como por ejemplo, el test de Kwiatkowski-Phillips-Schmidt-Shin (KPSS). El cual establece como hipótesis nula que la serie es estacionaria y como hipótesis alternativa que la serie no es estacionaria, P-valores pequeños indicarían que es necesario establecer al menos una diferenciación. (Redactarlo mejor)
+Por otro lado, diremos que una serie es no estacionaria si la media, la varianza y la covarianza no son constantes a través del tiempo. Una forma de solucionar la no estacionariedad en media es tomando una cantidad adecuada de diferencias de la serie, es decir, si la serie $\{y_t\}$ es no estacionaria y tomamos una cantidad $d$ de diferencias se obtiene una nueva serie $\{(1-B)^dy_t\}$ para algún entero $d \geq 1$, que es estacionaria. Para determinar cuantas diferenciaciones hay que realizarle a la serie se puede realizar por inspección de algún gráfico de la función de autocorrelación o bien realizar alguna prueba de hipótesis, como por ejemplo, el test de Kwiatkowski-Phillips-Schmidt-Shin (KPSS). El cual se emplea para verificar la hipótesis nula de que la serie es estacionaria. Por consiguiente, un p-valor inferior al nivel de significación adoptado (comúnmente 0,05) proporciona evidencia estadística oara rechazar dicha hipótesis, indicando la necesidad de aplicar una o más diferenciaciones para estabilizar la media.
 
-Sin embargo, un proceso puede ser estacionario en media pero no en variancia y covariancia. Por lo tanto, para corregir este problema es necesario aplicar las transformaciones de Box-Cox a la variable objetivo, definida como:
+Sin embargo, un proceso puede ser estacionario en media pero no en varianza y covarianza. Por lo tanto, para corregir este problema es necesario aplicar las transformaciones de Box-Cox a la variable objetivo, definida como:
 
 $$T(y_t) = \left\{\begin{matrix}
 \frac{y_t^{\lambda} - 1}{\lambda} \ si \ \lambda \neq 0 \\ ln(y_t) \ si \ \lambda = 0
@@ -170,13 +170,13 @@ donde $y_t$ representa el valor observado, $\phi_p(B) = (1- \phi_1B - \cdots - \
 
 \setlength{\parindent}{1.5em}
 
-La componente autorregresiva modela la dependencia entre el valor actual de la serie y sus valores pasados, por lo que un proceso autorregresivo de órden $p$ se lo puede escribir como:
+La componente autorregresiva modela la dependencia entre el valor actual de la serie y sus valores pasados, por lo que un proceso autorregresivo de orden $p$ puede escribirse como:
 
 $$\phi_p(B) y_t = \varepsilon_t$${#eq-ar}
 
-Este planteo es análogo a una regresión lineal múltiple, con la particularidad de que los predictores corresponden a valores rezagados de $y_t$. Este enfoque se denomina modelo autorregresivo $AR(p)$, el cual se formula, en general, series estacionarias y exige determinadas restricciones sobre sus parámetros. Por definición se tiene que un proceso $AR(p)$ es siempre invertible, pero para que sea estacionario es necesario que las raíces de $\phi_p(B) = 0$ caigan fuera del círculo unitario.
+Este enfoque es análogo a una regresión lineal múltiple, con la particularidad de que los predictores corresponden a valores rezagados de $y_t$. Este enfoque se denomina modelo autorregresivo $AR(p)$, que se formula, en general, para series estacionarias y exige determinadas restricciones sobre sus parámetros. Por definición, un proceso $AR(p)$ es siempre invertible, pero para que sea estacionario es necesario que las raíces de $\phi_p(B) = 0$ caigan fuera del círculo unitario.
 
-La componente promedio móvil refleja la dependencia entre el valor actual de la serie y los errores de pronósticos previos, por lo que un proceso promedio móvil de órden $q$ se lo puede escribir como:
+La componente promedio móvil refleja la dependencia entre el valor actual de la serie y los errores de pronósticos previos, por lo que un proceso promedio móvil de orden $q$ se lo puede escribir como:
 
 $$y_t = \theta_q(B)\varepsilon_t$${#eq-ma}
 
@@ -205,7 +205,7 @@ En cada iteración, los modelos candidatos son estimados mediante máxima verosi
 
 ![Ejemplo ilustrativo del proceso iterativo de búsqueda de los parámetros del algoritmo de Hyndman-Khandakar](Imgs/algoritmo_hk.png){#fig-algoritmohk}
 
-Si bien los modelos ARIMA y SARIMA constituyen un punto de partida indispensable, presentan limitaciones importantes cuando la serie contiene eventos disruptivos abruptos. Bajo estas circunstancias, los parámetros estimados a partir de datos previos a la disrupción pueden no reflejar adecuadamente el comportamiento posterior. Asimismo, la adaptación del modelo al patrón estacional posterior puede ser lento o inestable.
+Si bien los modelos ARIMA y SARIMA constituyen un punto de partida indispensable, presentan limitaciones importantes cuando la serie contiene eventos disruptivos abruptos. Bajo estas circunstancias, los parámetros estimados a partir de datos previos a la disrupción pueden no reflejar adecuadamente el comportamiento posterior. Asimismo, la adaptación del modelo al patrón estacional posterior puede ser lenta o inestable.
 
 Por estas razones, en este trabajo los modelos ARIMA y SARIMA se consideran como modelos de referencia (*baseline*) para la comparación con enfoques diseñados explícitamente para capturar interrupciones, tal como proponen Hyndman y Rostami-Tabar (2024).
 
@@ -260,7 +260,7 @@ donde $\ell_t$ es el nivel (o el valor suavizado) de la serie en el tiempo $t$. 
 
 \setlength{\parindent}{1.5em}
 
-Con respecto a la estimación de los parámetros, una opción puede ser elegir los valores de los parámetros de forma subjetiva (o en base a la experiencia previa). Sin embargo, una forma más fiable y objetiva de obtener valores para los paráemtros desconocidos es estimarlos a partir de los datos observados utilizando algún método de estimación, como puede ser mediante la minimización de la suma de cuadrados de los errores (SCE).
+Con respecto a la estimación de los parámetros, una opción puede ser elegir los valores de los parámetros de forma subjetiva (o en base a la experiencia previa). Sin embargo, una forma más fiable y objetiva de obtener valores para los parámetros desconocidos es estimarlos a partir de los datos observados utilizando algún método de estimación, como puede ser mediante la minimización de la suma de cuadrados de los errores (SCE).
 
 **Método lineal de Holt - ETS(A,A,N)**
 
@@ -297,7 +297,7 @@ donde $k$ es la parte entera de $\frac{h-1}{m}$, lo que garantiza que los índic
 
 Aquí, la ecuación de nivel representa un promedio ponderado entre la observación desestacionalizada $(y_t - s_{t-m})$ y el pronóstico no estacional correspondiente al período $t$, dado por $(\ell_{t-1} + b_{t-1})$. La ecuación de tendencia coincide con el método lineal de Holt. Por su parte, la ecuación estacional expresa un promedio ponderado entre el índice estacional actual, $(y_t - \ell_{t-1} - b_{t-1})$, y el índice correspondiente a la misma estación del ciclo anterior.
 
-Los modelos presentados previamente permiten capturar distintas configuraciones estructurales de la serie, tales como nivel, tendencia y estacionalidad. Cabe aclarar que se pueden presentar muchas más combinaciones dependendiendo de como ingresa cada componente al modelo, si de forma aditiva, multiplicativa o no ingresando. 
+Los modelos presentados previamente permiten capturar distintas configuraciones estructurales de la serie, tales como nivel, tendencia y estacionalidad. Cabe destacar que existen múltiples combinaciones posibles dependendiendo de como ingresa cada componente al modelo, si de forma aditiva, multiplicativa o no ingresando. 
 
 Con el fin de determinar la especificación más adecuada se utilizará la función `ETS()` del paquete `fable`, que permite hacer una selección automática del modelo ajustado, seleccionando aquel modelo que minimice el/los criterio/s de información $AICc$, $AIC$ o $BIC$. 
 
@@ -359,7 +359,7 @@ La incorporación de valores faltantes incrementa la incertidumbre del modelo, d
 
 ### Lo que podría haber ocurrido (*what might have been*)
 
-Este enfoque reconstruye el período de interrupción utilizando únicamente información del período previo a la interrupción, simulando el comportamiento que probablemente habría tenido la serie temporal si la interrupción no hubiese ocurrido. La idea consiste en reemplazar las observaciones distorsionadas por el evento disruptivo por valores estimados que reflejen la dinámica histórica del proceso antes de la interrupción. Las estrategias para obtener estas estimaciones se basan en:
+Este enfoque reconstruye el período de interrupción utilizando únicamente información previa al evento disruptivo, simulando el comportamiento que probablemente habría tenido la serie temporal si la interrupción no hubiese ocurrido. La idea consiste en reemplazar las observaciones distorsionadas por el evento disruptivo por valores estimados que reflejen la dinámica histórica del proceso antes de la interrupción. Las estrategias para obtener estas estimaciones se basan en:
 
 - utilizar los datos del periodo pre-disruptivo para estimar un modelo (ARIMA, ETS, etc), para luego obtener las observaciones estimadas durante el período disruptivo.
 
@@ -382,7 +382,7 @@ En el contexto de series interrumpidas, Hyndman y Rostami-Tabar (2024) destacan 
 - modelos de intervención,
 - modelos contrafactuales.
 
-Esta integración elimina la inestabilidad que presentan algunos métodos en la fase del *shock* o en la recuperación temprana.
+Esta integración permite reducir la inestabilidad que presentan algunos métodos en la fase del *shock* o en la recuperación temprana.
 
 La forma de *ensemble* utilizada en esta tesina será la combinación lineal simple, expresada como:
 
@@ -406,7 +406,7 @@ Con el fin de comparar el desempeño de los modelos propuestos, es necesario def
 
 ### Raíz del error cuadrático medio (RMSE)
 
-Es una medida directa del error de predicción en las mismas unidades que la variable de respuesta, representa la raíz cuadrada del promedio de las diferencias al cuadrado entre los valores observados y los valores predichos. Valores más pequeños indican buenos resultados. Su expresión resulta:
+Es una medida directa del error de predicción en las mismas unidades que la variable de respuesta, representa la raíz cuadrada del promedio de las diferencias al cuadrado entre los valores observados y los valores predichos. Valores bajos indican un mejor desempeño predictivo. Su expresión resulta:
 
 $$RMSE(\hat{y}, y) = \sqrt{\frac{1}{n}\sum_{i=1}^{n} \left( y_i - \hat{y}_i \right)^2}$${#eq-rmse}
 
@@ -418,7 +418,7 @@ donde $y_i$ es el i-ésimo valor real, $\hat{y}_i$ es el i-ésimo valor pronosti
 
 ### Error absoluto medio (MAE)
 
-Es una métrica que cuantifica la magnitud promedio de los errores en un conjunto de predicciones en las mismas unidades que la variable respuesta, sin considerar su dirección. Al centrarse únicamente en el tamaño de los errores, ayuda a identificar qué tan lejos están las predicciones de los resultados reales. Valores más pequeños indican buenos resultados. Su expresión resulta:
+Es una métrica que cuantifica la magnitud promedio de los errores en un conjunto de predicciones en las mismas unidades que la variable respuesta, sin considerar su dirección. Al centrarse únicamente en el tamaño de los errores, ayuda a identificar qué tan lejos están las predicciones de los resultados reales. Valores pequeños indican buenos resultados. Su expresión resulta:
 
 $$MAE(\hat{y}, y) = \frac{1}{n}\sum_{i=1}^{n} \left| y_i - \hat{y}_i \right|$${#eq-mae}
 
@@ -458,17 +458,13 @@ $$
 W_{\alpha} = \frac{1}{12} \cdot \sum_{t=1}^{12}W_{\alpha, t}
 $${#eq-winkler2}
 
-### Evaluación diferenciada por régimen temporal
+### Ajuste y evaluación de los modelos
 
-Dado que los eventos disruptivos producen cambios abruptos en la estructura temporal, la evaluación se realizará en tres segmentos, siguiendo el enfoque del artículo de Hyndman:
+Dado que los eventos disruptivos producen cambios abruptos en la estructura temporal, el procedimiento de ajuste y evaluación de los modelos se llevará a cabo en base a un esquema de 
+ajuste y evaluación con ventana expansiva (*expanding window*), el cual constituye un caso particular del enfoque de *rolling forecasting origin* utilizado en la literatura de series temporales (Hyndman y Athanasopoulos, 2021). Este método consiste en estimar el modelo utilizando observaciones hasta un tiempo $t$, generar pronósticos para $t+1$, y posteriormente ampliar el conjunto de entrenamiento incorporando las nuevas observaciones disponibles, y se repite el proceso hasta realizarlo en cada una de las ventanas definidas. 
 
-1. Durante el shock (2020): se evalúa la capacidad de adaptación inmediata.
+![Proceso ilustrativo de ajuste y evaluación de los modelos](Imgs/grafico_ventana.png){#fig-ventanaexp}
 
-2. Recuperación inmediata (2021–2022): se evalúa la velocidad con la que cada modelo retorna a un comportamiento estable.
-
-3. Horizontes extendidos (2023–2024): se evalúa estabilidad predictiva de mediano plazo.
-
-De este modo, es posible identificar no solo el mejor modelo en términos generales, sino también el método más adecuado para cada fase de la serie.
 
 \newpage
 
@@ -498,31 +494,31 @@ datos_series <- pasajeros |>
              regular = T)
 ```
 
-La aplicación empírica se desarrolla sobre una serie mensual de movilidad urbana correspondiente al total de pasajeros transportados por el sistema de Transporte Urbano de Pasajeros (TUP) de la ciudad de Rosario, abarcando el período comprendido entre enero de 2006 y diciembre de 2024, utilizando el *software* de programación R. 
+La aplicación empírica se desarrolla sobre una serie mensual de movilidad urbana correspondiente al total de pasajeros transportados por el sistema de Transporte Urbano de Pasajeros (TUP) de la ciudad de Rosario. El estudio abarca el período comprendido entre enero de 2006 y diciembre de 2024, y se llevó a cabo utilizando el lenguaje de programación R.
 
-Esta misma contiene una serie de características que la convierten en un caso adecuado para evaluar y comparar metodologías de pronóstico diseñadas para series interrumpidas. En particular, permiten analizar la capacidad de los distintos enfoques para adaptarse a cambios estructurales abruptos y generar pronósticos confiables en contextos de alta incertidumbre.
+Dicha serie presenta características que la convierten en un caso de estudio adecuado para evaluar y comparar metodologías de pronóstico diseñadas para series interrumpidas. En particular, permite analizar la capacidad de los distintos enfoques para adaptarse a cambios estructurales abruptos y generar pronósticos confiables en contextos de alta incertidumbre. 
 
-El procedimiento de aplicación se estructurará de acuerdo con los siguientes pasos:
+El procedimiento se estructuró de acuerdo con los siguientes pasos:
 
-- Preprocesamiento de los datos: Se lleva a cabo un proceso riguroso de limpieza y transformación de los datos, utilizando herramientas provistas por los paquetes `tidyverse` y `lubridate`.
+- Preprocesamiento de los datos: Se realizó un proceso riguroso de limpieza y transformación de los datos, utilizando herramientas provistas por los paquetes `tidyverse` y `lubridate`.
 
-- Análisis de las características de la serie: Se examinan las propiedades intrínsecas de la serie, incluyendo la identificación de tendencia, estacionalidad y período donde ocurre la disrupción, a través de herramientas visuales implementadas con la librería `ggplot2`.
+- Análisis de las características de la serie: Se examinaron las propiedades intrínsecas de la serie, incluyendo la identificación de tendencia, estacionalidad y período donde ocurre la disrupción, a través de herramientas visuales implementadas con la librería `ggplot2`.
 
-- Modelización y análisis del shock pandémico (2020) y de la etapa de recuperación (2021–2024): Se ajustan los modelos previamente seleccionados para capturar y pronosticar esta transición, empleando las librerias del paquete `fpp3`.
+- Modelización y análisis del shock pandémico (2020) y de la etapa de recuperación (2021–2024): Se ajustaron los modelos previamente seleccionados para capturar y pronosticar esta transición, empleando las librerías del paquete `fpp3`.
 
-- Evaluación comparada de pronósticos: Se evalua el desempeño de los diversos enfoques tanto durante la disrupción como en el período posterior, a través de métricas puntuales y probabilísticas, utilizando las librerias del paquete `fpp3`.
+- Evaluación comparada de pronósticos: Se evaluó el desempeño de los diversos enfoques tanto durante la disrupción como en el período posterior, a través de métricas puntuales y probabilísticas, utilizando las librerias del paquete `fpp3`.
 
 El propósito de esta aplicación es, por un lado, ofrecer un análisis riguroso de la evolución de la movilidad urbana en la ciudad de Rosario a lo largo de casi dos décadas y, por otro, generar evidencia empírica sólida que permita identificar qué estrategias de modelización resultan más adecuadas para el tratamiento de series temporales interrumpidas, caracterizadas por *shocks* abruptos y procesos de recuperación graduales.
 
 ## Análisis descriptivo
 
-La serie en estudio corresponde al número de pasajeros transportados de forma mensual por el sistema de Transporte Urbano de Pasajeros (TUP) en la ciudad de Rosario. (Fuente de los datos).
+La serie en estudio corresponde al número de pasajeros transportados de forma mensual por el sistema de Transporte Urbano de Pasajeros (TUP) en la ciudad de Rosario.
 
-Se considera como pasajeros transportados al total de viajes abonados mediante el sistema de cancelación, independientemente de la existencia de beneficios, subsidios o gratuidades. Esta definición permite trabajar con una medida homogénea y comparable a lo largo del tiempo, representativa del volumen real de demanda del sistema. 
+Se define como "pasajeros transportados" al volumen total de viajes abonados mediante el sistema de cancelación, independientemente de la existencia de beneficios, subsidios o gratuidades. Esta definición permite trabajar con una medida homogénea y comparable a lo largo del tiempo, representativa del volumen real de demanda del sistema. 
 
-En la @fig-serie1 se observa la evolución temporal de la serie para el período comprendido entre enero de 2006 y diciembre de 2024. En términos generales, la serie presenta un comportamiento relativamente estable durante el período previo a 2020, con fluctuaciones moderadas alrededor de un nivel elevado de utilización del servicio. Sin embargo, se identifican claramente un conjunto de observaciones atípicas durante los años 2020 y 2021, las cuales constituyen un quiebre significativo en la dinámica de la serie.
+En la @fig-serie1 se observa la evolución temporal de la serie para el período comprendido entre enero de 2006 y diciembre de 2024. En términos generales, la serie presenta un comportamiento estable hasta 2019, con fluctuaciones moderadas alrededor de un nivel elevado de utilización. No obstante, resulta evidente la presencia de un conjunto de observaciones atípicas durante los años 2020 y 2021, las cuales constituyen un quiebre significativo en la dinámica de la demanda.
 
-Estas observaciones atípicas se explican por las restricciones sanitarias impuestas en el contexto de la pandemia de COVID-19, las cuales afectaron de manera directa la movilidad urbana. Como consecuencia, se registra una caída abrupta en el número de pasajeros transportados, seguida de un proceso de recuperación posterior. No obstante, dicha recuperación presenta un comportamiento no lineal y, en general, no alcanza los niveles observados en el período pre-pandemia, lo que sugiere la posible existencia de cambios estructurales persistentes en la demanda del servicio.
+Estas observaciones atípicas se explican por las restricciones sanitarias impuestas en el contexto de la pandemia de COVID-19, las cuales afectaron de manera directa la movilidad urbana. Como consecuencia, se registra una caída abrupta en el número de pasajeros transportados, seguida de un proceso de recuperación posterior. No obstante, dicha recuperación presenta un comportamiento no lineal y, en general, no alcanza los niveles observados en el período prepandemia, lo que sugiere la posible existencia de cambios estructurales persistentes en la demanda del servicio.
 
 Por otro lado, la @fig-serie2 permite analizar el comportamiento estacional de la serie. Se observa una estacionalidad anual bien definida, con caídas sistemáticas en los meses asociados a períodos vacacionales, particularmente en diciembre, enero y febrero, así como en julio. Estos descensos se encuentran vinculados a la reducción de la actividad educativa y laboral, lo cual impacta directamente en la demanda del transporte público.
 
@@ -657,7 +653,7 @@ conf.lims <- c(-1,1)*qnorm((1 + alpha)/2)/sqrt(autocorrelacion_dif$n.used)
 ```
 
 
-Al aplicar la transformación correspondiendo a la variable respuesta, en la @fig-serie6 se presenta la evolución temporal del logaritmo natural de los pasajeros, junto con su distribución anual. Se observa que el rango de la variable se reduce considerablemente, lo que contribuye a una mayor estabilidad en la varianza. Al analizar el comportamiento de la serie en los años de interés, se observa que hasta el año 2019, la variable parece ser estable en varianza pero no en media. Este comportamiento sugiere la conveniencia de aplicar una diferenciación en la serie, como estrategia para solucionar la no estacionariedad en media.
+Al aplicar la transformación correspondiente a la variable respuesta, en la @fig-serie6 se presenta la evolución temporal del logaritmo natural de los pasajeros, junto con su distribución anual. Se observa que el rango de la variable se reduce considerablemente, lo que contribuye a una mayor estabilidad en la varianza. Al analizar el comportamiento de la serie en los años de interés, se observa que hasta el año 2019, la variable parece ser estable en varianza pero no en media. Este comportamiento sugiere la conveniencia de aplicar una diferenciación en la serie, como estrategia para solucionar la no estacionariedad en media.
 
 ```{r graf 6}
 #| label: fig-serie6
@@ -700,7 +696,7 @@ ajuste5 <- ensemble_sol5(list(ajuste1$pronostico, ajuste2$pronostico, ajuste3$pr
 load("Resultados modelos/resultados_modelos.RData")
 ```
 
-En esta sección se presentan los resultados del ajuste de los distintos modelos considerados, con el objetivo de analizar su capacidad para capturar la dinámica de la serie ante la presencia de un evento disruptivo, como fue la pandemia de COVID-19, así como también su desempeño en la fase de recuperación y estabilización.
+En esta sección se presentan los resultados del ajuste de los modelos, evaluando su capacidad para capturar la dinámica de la serie ante el evento disruptivo (año 2020) y su desempeño en la fase de recuperación (años 2021-2022) y estabilización (años 2023-2024).
 
 Para ello, se estimaron los modelos anteriormente presentados, cuyos resultados se presentan a continuación.
 
@@ -708,24 +704,24 @@ Para ello, se estimaron los modelos anteriormente presentados, cuyos resultados 
 
 Los modelos ARIMA/SARIMA fueron ajustados sobre la serie previamente transformada con el fin de capturar la dependencia temporal observada en el análisis exploratorio. En particular, se consideraron tanto componentes no estacionales como estacionales, permitiendo modelar adecuadamente la dinámica mensual de la serie.
 
-Dado que el análisis se realiza bajo un esquema de evaluación por ventanas móviles, los modelos estimados no son únicos, sino que varían en función del período de entrenamiento considerado. En este sentido, la @tbl-ajuste1 resume las especificaciones seleccionadas en cada una de las etapas analizadas. Cabe destacar que la amplitud de los intervalos de predicción en la fase de estabilización son muy amplios indicando alta incertidumbre en los modelos.
+Dado que el análisis se realiza bajo un esquema de evaluación por ventanas expansivas, los modelos estimados no son únicos, sino que varían en función del período de entrenamiento considerado. En este sentido, la @tbl-ajuste1 resume las especificaciones seleccionadas en cada una de las etapas analizadas. Cabe destacar que la amplitud de los intervalos de predicción en la fase de estabilización es muy grande, lo que refleja la alta incertidumbre residual en el modelo.
 
 ```{r modelos_ajustados1}
 #| tbl-cap: "Modelos ajustados en cada fase"
 #| label: tbl-ajuste1
 
 data.frame(
-  entrenamiento = c("Hasta 2019", "Hasta 2020", "Hasta 2021", "Hasta 2022", "Hasta 2023"),
+  entrenamiento = c("1", "2", "3", "4", "5"),
   modelos = c("$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(1,1,3)(0,0,2)_{12}$", "$SARIMA(1,1,3)(0,0,2)_{12}$", "$SARIMA(1,1,3)(0,0,1)_{12}$", "$SARIMA(1,1,3)(0,0,2)_{12}$")
 ) |> 
-  kable(col.names = c("Entrenamiento", "Modelos ajustados"))
+  kable(col.names = c("Ventana", "Modelos ajustados"))
 ```
 
-En términos de desempeño predictivo, la @fig-pronostico1 presenta los pronósticos generados en cada una de las diferentes etapas. Durante el período del evento disruptivo (año 2020), se observa que el modelo estimado no logra predecir adecuadamente la magnitud de la caída de la serie. Esto se debe a que estos modelos se basan en la información histórica, por lo que tienden a extrapolar. 
+En términos de desempeño predictivo, la @fig-pronostico1 presenta los pronósticos generados en cada una de las diferentes etapas. Durante el período del evento disruptivo, se observa que el modelo estimado no logra predecir adecuadamente la magnitud de la caída de la serie. Esto se debe a que estos modelos se basan en la información histórica, por lo que tienden a extrapolar. 
 
-En la fase de recuperación inmediata (años 2021 y 2022), se aprecia una mejora progresiva en la capacidad predictiva. A medida que se incorporan observaciones correspondientes al período posterior al evento disruptivo, estos modelos comienzan a mejorar el ajuste, reflejando parcialmente el proceso de recuperación. Sin embargo, se observan desvíos de los valores reales de la serie, lo cual indica que la recuperación no es inmediata.
+En la fase de recuperación inmediata, se aprecia una mejora progresiva en la capacidad predictiva. A medida que se incorporan observaciones correspondientes al período posterior al evento disruptivo, estos modelos comienzan a mejorar el ajuste, reflejando parcialmente el proceso de recuperación. Sin embargo, se observan desvíos de los valores reales de la serie, lo cual indica que la recuperación no es inmediata.
 
-Finalmente, en la etapa de estabilización (años 2023 y 2024), estos modelos muestran un desempeño  superior. En este período, la serie presenta un comportamiento más regular y predecible, lo que permite a los modelos ajustados capturar de manera más precisa su evolución. En particular, el pronóstico correspondiente al año 2024 exhibe un alto grado de concordancia con los valores reales, tanto en términos puntuales como en la cobertura de los intervalos de predicción.
+Finalmente, en la etapa de estabilización, estos modelos muestran un desempeño  superior. En este período, la serie presenta un comportamiento más regular y predecible, lo que permite a los modelos ajustados capturar de manera más precisa su evolución. En particular, el pronóstico correspondiente al año 2024 exhibe un alto grado de concordancia con los valores reales, tanto en términos puntuales como en la cobertura de los intervalos de predicción.
 
 ```{r graf_pronosticos1}
 #| label: fig-pronostico1
@@ -757,10 +753,10 @@ Los modelos ETS ajustados sobre la serie transformada en cada etapa corresponden
 #| label: tbl-ajuste2
 
 data.frame(
-  entrenamiento = c("Hasta 2019", "Hasta 2020", "Hasta 2021", "Hasta 2022", "Hasta 2023"),
+  entrenamiento = c("1", "2", "3", "4", "5"),
   modelos = c("$ETS(M,A,A)$", "$ETS(A,N,A)$", "$ETS(A,N,A)$", "$ETS(A,N,A)$", "$ETS(A,N,A)$")
 ) |> 
-  kable(col.names = c("Entrenamiento", "Modelos ajustados"))
+  kable(col.names = c("Ventana", "Modelos ajustados"))
 ```
 
 A diferencia de los modelos ARIMA/SARIMA, los modelos ETS presentan una mayor capacidad de adaptación frente a cambios repentinos en la dinámica de la serie. Este comportamiento se evidencia en la @fig-pronostico2, donde se observa que, si bien durante el período del *shock* los pronósticos resultan similares a los obtenidos mediante modelos ARIMA/SARIMA, en la fase de recuperación inmediata los modelos ETS logran ajustarse con mayor rapidez a la nueva estructura de la serie, lo que se traduce en una mejora sustancial en la calidad de los pronósticos, reflejando una capacidad superior para capturar la recuperación gradual de la serie.
@@ -789,14 +785,23 @@ g6_graf_pronosticos(ajuste1$pronostico |> filter(.model == "ets"), 2024, 80, col
 
 ### Modelos de intervención
 
-Estos modelos requieren de la definición de una variable explicativa que haga referencia a la intervención que estamos estudiando, en este caso, la situación vivida en el país debido a la pandemia de COVID-19. Para ello, definimos como variable explicativa a la siguiente: 
+Estos modelos requieren definir variables explicativas que representen la intervención sobre la serie. Se estableció una variable indicadora ($x_{1,t}$) de la siguiente manera: 
 
-$$x_t = \left\{\begin{matrix}
+$$x_{1,t} = \left\{\begin{matrix}
 0 & \text{si} \ t \notin \ \text{Marzo 2020 - Julio 2021} \\
 1 & \text{si} \ t \in \ \text{Marzo 2020 - Julio 2021} \\
 \end{matrix}\right.$${#eq-varindicadora}
 
-Dicha variable indicadora, se estableció de esta forma por la drástica baja de la utilización de este servicio público debido a el Aislamiento Social, Preventivo y Obligatorio (ASPO) establecido en Argentina a partir del 20 de marzo del 2020 
+Esta variable captura la drástica reducción en la utilización del servicio público debido al Aislamiento Social, Preventivo y Obligatorio (ASPO) establecido en Argentina a partir del 20 de marzo de 2020. 
+
+Adicionalmente, con el fin de enriquecer la especificación del modelo evento, se incorporó una segunda variable indicadora ($x_{2,t}$) con el objetivo que la misma capture el aumento progresivo y no lineal de la demanda del servicio. La misma se la define como:
+
+$$x_{2,t} = \left\{\begin{matrix}
+0 & \text{si} \ t \notin \ \text{Agosto 2021 - Dicimiebre 2024} \\
+1 & \text{si} \ t \in \ \text{Agosto 2021 - Dicimiebre 2024} \\
+\end{matrix}\right.$${#eq-segvarindicadora}
+
+En este enfoque, se puede observar en la @fig-pronostico3 que estos modelos presentan limitaciones para adaptarse con rapidez al evento disruptivo, dado que en la fase de recuperación inmediata los pronósticos se encuentran muy lejos de los valores reales. Recién en la fase de estabilización, los pronósticos comienzan a aproximarse a la verdadera trayectoria de la serie.
 
 ```{r graf_pronosticos3}
 #| label: fig-pronostico3
@@ -821,11 +826,27 @@ g6_graf_pronosticos(ajuste2$pronostico, 2024, 80, color = "#AE00B8")
 ### Métodos contrafactuales
 
 #### Establecer como faltante (*set to missing*)
+
+En este enfoque, se establece como faltantes aquellas observaciones que pertenecen al período disruptivo comprendido entre Marzo de 2020 y Julio de 2021, afectando directamente a todas aquellas ventanas de entrenamiento y pronóstico que incluyan dicho intervalo.
+
+```{r figura de la serie a entrenar}
+#| fig-cap: ""
+
+datos_series |>
+    mutate(
+      pasajeros = if_else((mes_anio >= yearmonth("2020 mar") & mes_anio <= yearmonth("2021 jul")), NA_real_, pasajeros)
+    ) |> g1_evol_serie()
+```
+
+Como consecuencia, el modelo no toma en cuenta la caída abrupta observada durante la pandemia, sino que extrapola la dinámica previa a la misma. En la @fig-pronostico4 se puede observar que los pronósticos durante los años 2020 y 2021 están muy por encima de los valores reales, comportamiento que resulta esperable dado que no se consideran esas observaciones durante el entrenamiento de los modelos. 
+
+Sin embargo, luego del período disruptivo, la capacidad predictiva del modelo mejora de manera considerable. En los años posteriores, los pronósticos comienzan a aproximarse a los valores observados.
+
 ```{r graf_pronosticos4}
 #| label: fig-pronostico4
 #| layout-nrow: 3
 #| layout-ncol: 2
-#| fig-cap: "Pronósticos utilizando la estrategia 'establecer como faltante'"
+#| fig-cap: "Pronósticos utilizando modelos contrafactuales 'STM'"
 #| fig-subcap: 
 #|    - "Pronóstico año 2020"
 #|    - "Pronóstico año 2021"
@@ -844,11 +865,37 @@ g6_graf_pronosticos(ajuste3$pronostico, 2024, 80, color = "#E51010")
 
 #### Lo que podría haber ocurrido (*what might have been*)
 
+A diferencia del método anterior, en este caso se opta por imputar los valores faltantes correspondientes a el período comprendido entre Marzo 2020 - Julio 2021. Para ello, se reemplazo cada observación faltante por el promedio de cada mes utilizando las observaciones de los 3 años previos al inicio de la interrupción.
+
+```{r figura de la serie a entrenar 2}
+#| fig-cap: ""
+
+promedio_3a <- datos_series |>
+    filter(
+      mes_anio >= yearmonth("2020 March") - 3 * 12,
+      mes_anio <= yearmonth("2020 Feb")
+    ) |>
+    as_tibble() |>
+    summarise(ave = mean(pasajeros), .by = "Mes")
+  
+  # Se completa el dataframe con la imputacion en el periodo de la pandemia
+datos_series_wmhb <- datos_series |> 
+  left_join(promedio_3a, by = "Mes") |> 
+  mutate(pasajeros = if_else((mes_anio >= yearmonth("2020 Mar") & mes_anio <= yearmonth("2021 Jul")), ave, pasajeros)) |> 
+  dplyr::select(-ave)
+  
+datos_series_wmhb |> g1_evol_serie()
+```
+
+No obstante, durante la fase de recuperación inmediata se observa que este método no logra adaptarse adecuadamente a los cambios abruptos en la dinámica de la serie, dado que la imputación se basa exclusivamente en información previa a la disrupción y, por lo tanto, no incorpora la nueva dinámica de la demanda del servicio. En consecuencia, los errores de pronóstico tienden a ser elevados.
+
+Sin embargo, tal como se muestra en la @fig-pronostico5, a medida que se incorporan nuevas observaciones reales al proceso de estimación, los modelos comienzan a ajustarse progresivamente, generando pronósticos cada vez más cercanos a los valores reales, reduciendo considerablemente los errores de pronóstico. Esto sugiere una mejor capacidad de adaptación en el mediano-largo plazo.
+
 ```{r graf_pronosticos5}
 #| label: fig-pronostico5
 #| layout-nrow: 3
 #| layout-ncol: 2
-#| fig-cap: "Pronósticos utilizando la estrategia 'lo que podría haber ocurrido'"
+#| fig-cap: "Pronósticos utilizando modelos contrafactuales 'WMHB'"
 #| fig-subcap: 
 #|    - "Pronóstico año 2020"
 #|    - "Pronóstico año 2021"
@@ -866,6 +913,12 @@ g6_graf_pronosticos(ajuste4$pronostico, 2024, 80, color = "#02A144")
 \newpage
 
 ### Ensemble
+
+En este enfoque se propone una estrategia de combinación de pronósticos, integrando las cuatro metodologías consideradas mediante un promedio simple. Esta aproximación busca aprovechar la información complementaria de cada modelo, reduciendo la variabilidad individual y mejorando la robustez de las predicciones.
+
+Tal como se observa en la @fig-pronostico6, los pronósticos obtenidos mediante esta estrategia presentan una adaptación más rápida frente a los cambios abruptos en comparación con los enfoques individuales, lo cual constituye una evidencia de su capacidad para responder ante fases tempranas de eventos disruptivos. Asimismo, en las ventanas de pronóstico posteriores, los valores estimados se mantienen cercanos a los observados, reflejando un desempeño consistente a lo largo del tiempo.
+
+Por lo tanto, estos resultados indican que la estrategia de combinación no solo mejora la precisión predictiva, sino que también aporta mayor estabilidad y capacidad de adaptación, posicionándose como una buena alternativa frente a este tipo de escenarios.
 
 ```{r graf_pronosticos6}
 #| label: fig-pronostico6
@@ -889,7 +942,6 @@ g6_graf_pronosticos(ajuste5, 2024, 80, color = "#E0BF00")
 \newpage
 
 ## Resultados
-
 
 ```{r resultados df}
 resultados_arima_ets <- rbind(
@@ -950,78 +1002,53 @@ resultados_ensemble <- rbind(
 resultados_unidos <- rbind(resultados_arima_ets, resultados_mint, resultados_stm, resultados_wmhb, resultados_ensemble) |> arrange(pronostico)
 ```
 
-```{r resultados}
-resultados_unidos |> 
-  ggplot() +
-  aes(x = pronostico, y = RMSE, group = .model) +
-  geom_point(aes(color = factor(.model))) +
-  geom_line() +
-  labs(x = "Año de pronóstico", color = "Estrategia") +
-  theme_bw() +
-  theme(legend.position = "bottom")
-```
+Para evaluar el desempeño predictivo de los distintos modelos en cada ventana de pronóstico se utilizaron métricas de capacidad predictiva puntual y de calidad del intervalo de pronóstico los cuales fueron construidos utilizando una probabilidad de cobertura del 80%.
 
+Los resultados obtenidos muestran que durante el año 2020 todos los enfoques presentan errores elevados como consecuencia de la ocurrencia del evento disruptivo, así como una limitada capacidad de adaptación ante cambios abruptos por parte de los modelos tradicionales (ARIMA/SARIMA). En este período, se observa un deterioro generalizado en todas las métricas, acompañado de intervalos de predicción menos informativos.
 
-```{r resultados2}
-resultados_unidos |> 
-  ggplot() +
-  aes(x = pronostico, y = MAE, group = .model) +
-  geom_point(aes(color = factor(.model))) +
-  geom_line() +
-  labs(x = "Año de pronóstico", color = "Estrategia") +
-  theme_bw() +
-  theme(legend.position = "bottom")
-```
+Por otra parte, los métodos de combinación evidencian un desempeño superior, reflejado en una menor magnitud de error y una mejor calidad de los intervalos de predicción. Esta mejora resulta especialmente notable tanto en las fases tempranas posteriores al quiebre estructural como en el mediano y largo plazo. En este contexto, los métodos contrafactuales, más especificamente (*what might have been*), muestra un comportamiento destacado entre los enfoques individuales, evidenciando una rápida mejora y una adecuada adaptación a medida que se incorporan nuevas observaciones.
 
-```{r resultados3}
-resultados_unidos |> 
-  ggplot() +
-  aes(x = pronostico, y = MAPE, group = .model) +
-  geom_point(aes(color = factor(.model))) +
-  geom_line() +
-  labs(x = "Año de pronóstico", color = "Estrategia") +
-  theme_bw() +
-  theme(legend.position = "bottom")
-```
+A su vez, a medida que se incorporan nuevas observaciones y los modelos logran capturar la nueva dinámica de la serie, todos los enfoques tienden a converger hacia un buen desempeño en el largo plazo, reflejado en la disminución progresiva de los errores y en una mejora en la calidad de los intervalos de predicción.
 
-```{r resultados4}
-resultados_unidos |> 
-  ggplot() +
-  aes(x = pronostico, y = winkler, group = .model) +
-  geom_point(aes(color = factor(.model))) +
-  geom_line() +
-  labs(x = "Año de pronóstico", color = "Estrategia") +
-  theme_bw() +
-  theme(legend.position = "bottom")
-```
-
-```{r}
-#| tbl-cap: "Evaluación de los pronósticos para cada estrategia utilizada"
-#| layout-ncol: 1
-#| layout-nrow: 4
-#| tbl-subcap: 
-#|    - "RMSE"
-#|    - "MAE"
-#|    - "MAPE"
-#|    - "Puntuación de Winlker"
+```{r metrica 1}
+#| tbl-cap: "Evaluación de los pronósticos usando (RMSE) para cada enfoque"
+#| label: tablametrica1
 
 resultados_unidos |> 
   dplyr::select(.model, RMSE, pronostico) |> 
   pivot_wider(names_from = pronostico, values_from = RMSE) |>
   kable(col.names = c("Estrategia", "2020", "2021", "2022", "2023", "2024"), 
         format = 'pipe', digits = 4)
+```
+
+\newpage
+
+```{r metrica 2}
+#| tbl-cap: "Evaluación de los pronósticos usando (MAE) para cada enfoque"
+#| label: tablametrica2
 
 resultados_unidos |> 
   dplyr::select(.model, MAE, pronostico) |> 
   pivot_wider(names_from = pronostico, values_from = MAE) |>
   kable(col.names = c("Estrategia", "2020", "2021", "2022", "2023", "2024"), 
         format = 'pipe', digits = 4)
+```
+
+
+```{r metrica 3}
+#| tbl-cap: "Evaluación de los pronósticos usando (MAPE) para cada enfoque"
+#| label: tablametrica3
 
 resultados_unidos |> 
   dplyr::select(.model, MAPE, pronostico) |> 
   pivot_wider(names_from = pronostico, values_from = MAPE) |>
   kable(col.names = c("Estrategia", "2020", "2021", "2022", "2023", "2024"), 
         format = 'pipe', digits = 4)
+```
+
+```{r metrica 4}
+#| tbl-cap: "Evaluación de los pronósticos usando (Puntuación de Winkler) para cada enfoque"
+#| label: tablametrica4
 
 resultados_unidos |> 
   dplyr::select(.model, winkler, pronostico) |> 
@@ -1030,6 +1057,9 @@ resultados_unidos |>
         format = 'pipe', digits = 4)
 ```
 
+Cabe aclarar que, si bien los modelos ARIMA/SARIMA presentan un mejor comportamiento en términos de diagnóstico de residuos (independencia y normalidad), los enfoques más adaptativos, como ETS y los métodos de combinación (*Ensemble*), logran una mayor precisión en el corto plazo. Esto sugiere que, en presencia de eventos disruptivos, la capacidad de adaptación a cambios abruptos resulta más relevante para el pronóstico que el cumplimiento estricto de los supuestos clásicos.
+
+En línea con Hyndman y Rostami-Tabar (2024), en series afectadas por quiebres estructurales, la adaptabilidad del modelo adquiere un rol central en la precisión predictiva, superando la importancia de la “pureza” de los residuos, la cual suele verse comprometida ante shocks de gran magnitud.
 
 \newpage
 
@@ -1037,12 +1067,18 @@ resultados_unidos |>
 
 \newpage
 
+# Futuras líneas
+
+\newpage
+
 # Anexo
 
-Poner el link de github...
+Todo el desarrollo de la tesis se puede encontrar en el siguiente repositorio de [Github](https://github.com/Franco-Santini/Tesina-de-Grado.git)
 
 
 ```{r residuos modelos1}
+#| fig-cap: "Residuos modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
 ajuste1$modelos |>
   filter(.id == 1) |> 
   dplyr::select(arima) |> 
@@ -1050,12 +1086,17 @@ ajuste1$modelos |>
 ```
 
 ```{r residuos modelos2}
+#| fig-cap: "Residuos modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+
 ajuste1$modelos |>
   filter(.id == 2) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
+
 ```{r residuos modelos3}
+#| fig-cap: "Residuos modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+
 ajuste1$modelos |>
   filter(.id == 3) |> 
   dplyr::select(arima) |> 
@@ -1064,6 +1105,8 @@ ajuste1$modelos |>
 
 
 ```{r residuos modelos4}
+#| fig-cap: "Residuos modelo $SARIMA(1,1,3)(0,0,1)_{12}$"
+
 ajuste1$modelos |>
   filter(.id == 4) |> 
   dplyr::select(arima) |> 
@@ -1071,6 +1114,8 @@ ajuste1$modelos |>
 ```
 
 ```{r residuos modelos5}
+#| fig-cap: "Residuos modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+
 ajuste1$modelos |>
   filter(.id == 5) |> 
   dplyr::select(arima) |> 
@@ -1078,12 +1123,17 @@ ajuste1$modelos |>
 ```
 
 ```{r residuos modelos6}
+#| fig-cap: "Residuos modelo $ETS(M,A,A)$"
+
 ajuste1$modelos |>
   filter(.id == 1) |> 
   dplyr::select(ets) |> 
   gg_tsresiduals()
 ```
+
 ```{r residuos modelos7}
+#| fig-cap: "Residuos modelo $ETS(A,N,A)$"
+
 ajuste1$modelos |>
   filter(.id == 2) |> 
   dplyr::select(arima) |> 
@@ -1091,6 +1141,8 @@ ajuste1$modelos |>
 ```
 
 ```{r residuos modelos8}
+#| fig-cap: "Residuos modelo $ETS(A,N,A)$"
+
 ajuste1$modelos |>
   filter(.id == 3) |> 
   dplyr::select(arima) |> 
@@ -1098,6 +1150,8 @@ ajuste1$modelos |>
 ```
 
 ```{r residuos modelos9}
+#| fig-cap: "Residuos modelo $ETS(A,N,A)$"
+
 ajuste1$modelos |>
   filter(.id == 4) |> 
   dplyr::select(arima) |> 
@@ -1105,6 +1159,8 @@ ajuste1$modelos |>
 ```
 
 ```{r residuos modelos10}
+#| fig-cap: "Residuos modelo $ETS(A,N,A)$"
+
 ajuste1$modelos |>
   filter(.id == 5) |> 
   dplyr::select(arima) |> 
@@ -1112,18 +1168,26 @@ ajuste1$modelos |>
 ```
 
 ```{r residuos modelos11}
+#| fig-cap: "Residuos modelo intervencion $SARIMA(1,0,2)(1,1,0)_{12}$"
+
 ajuste2$modelos |>
   filter(.id == 1) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
+
 ```{r residuos modelos12}
+#| fig-cap: "Residuos modelo intervencion $SARIMA(0,1,1)(0,0,1)_{12}$"
+
 ajuste2$modelos |>
   filter(.id == 2) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
+
 ```{r residuos modelos13}
+#| fig-cap: "Residuos modelo intervencion $SARIMA(1,0,2)(0,0,2)_{12}$"
+
 ajuste2$modelos |>
   filter(.id == 3) |> 
   dplyr::select(arima) |> 
@@ -1131,12 +1195,17 @@ ajuste2$modelos |>
 ```
 
 ```{r residuos modelos14}
+#| fig-cap: "Residuos modelo intervencion $SARIMA(1,0,2)(0,0,2)_{12}$"
+
 ajuste2$modelos |>
   filter(.id == 4) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
+
 ```{r residuos modelos15}
+#| fig-cap: "Residuos modelo intervencion $SARIMA(1,0,2)(0,0,2)_{12}$"
+
 ajuste2$modelos |>
   filter(.id == 5) |> 
   dplyr::select(arima) |> 
@@ -1144,12 +1213,17 @@ ajuste2$modelos |>
 ```
 
 ```{r residuos modelos16}
+#| fig-cap: "Residuos modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+
 ajuste3$modelos |>
   filter(.id == 1) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
+
 ```{r residuos modelos17}
+#| fig-cap: "Residuos modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+
 ajuste3$modelos |>
   filter(.id == 2) |> 
   dplyr::select(arima) |> 
@@ -1157,6 +1231,8 @@ ajuste3$modelos |>
 ```
 
 ```{r residuos modelos18}
+#| fig-cap: "Residuos modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+
 ajuste3$modelos |>
   filter(.id == 3) |> 
   dplyr::select(arima) |> 
@@ -1164,6 +1240,8 @@ ajuste3$modelos |>
 ```
 
 ```{r residuos modelos19}
+#| fig-cap: "Residuos modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+
 ajuste3$modelos |>
   filter(.id == 4) |> 
   dplyr::select(arima) |> 
@@ -1171,6 +1249,8 @@ ajuste3$modelos |>
 ```
 
 ```{r residuos modelos20}
+#| fig-cap: "Residuos modelo stm $SARIMA(1,0,2)(0,1,0)_{12}$"
+
 ajuste3$modelos |>
   filter(.id == 5) |> 
   dplyr::select(arima) |> 
@@ -1178,37 +1258,93 @@ ajuste3$modelos |>
 ```
 
 ```{r residuos modelos21}
+#| fig-cap: "Residuos modelo wmhb $SARIMA(1,0,2)(1,1,0)_{12}$"
+
 ajuste4$modelos |>
   filter(.id == 1) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
+
 ```{r residuos modelos22}
+#| fig-cap: "Residuos modelo wmhb $SARIMA(2,0,3)(0,1,1)_{12}$"
+
 ajuste4$modelos |>
   filter(.id == 2) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
 
-```{r residuos modelos22}
+```{r residuos modelos23}
+#| fig-cap: "Residuos modelo wmhb $SARIMA(2,0,0)(0,1,1)_{12}$"
+
 ajuste4$modelos |>
   filter(.id == 3) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
 
-```{r residuos modelos23}
+```{r residuos modelos24}
+#| fig-cap: "Residuos modelo wmhb $SARIMA(1,0,2)(0,1,1)_{12}$"
+
 ajuste4$modelos |>
   filter(.id == 4) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
 ```
 
-```{r residuos modelos24}
+```{r residuos modelos25}
+#| fig-cap: "Residuos modelo wmhb $SARIMA(1,0,1)(2,1,1)_{12}$"
+
 ajuste4$modelos |>
   filter(.id == 5) |> 
   dplyr::select(arima) |> 
   gg_tsresiduals()
+```
+
+
+```{r resultados modelos 1}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = RMSE, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line(aes(color = factor(.model))) +
+  labs(x = "Año de pronóstico", color = "Estrategia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+```{r resultados modelos 2}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = MAE, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line(aes(color = factor(.model))) +
+  labs(x = "Año de pronóstico", color = "Estrategia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+```{r resultados modelos 3}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = MAPE, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line(aes(color = factor(.model))) +
+  labs(x = "Año de pronóstico", color = "Estrategia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+```{r resultados modelos 4}
+resultados_unidos |> 
+  ggplot() +
+  aes(x = pronostico, y = winkler, group = .model) +
+  geom_point(aes(color = factor(.model))) +
+  geom_line(aes(color = factor(.model))) +
+  labs(x = "Año de pronóstico", color = "Estrategia", y = "Winkler") +
+  theme_bw() +
+  theme(legend.position = "bottom")
 ```
 
 \newpage
