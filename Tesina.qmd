@@ -169,11 +169,6 @@ $$\hat{y}_{T+l|T} = E(y_{n+l}|y_n,y_{n-1},...)$${#eq-pron}
 
 Se podria hablar de intervalos de predicción haciendo el supuesto de distribución normal y/o los intervalos de predicción a partir de distribuciones simuladas de la variable respuesta.
 
-### Limitaciones en la modelización de series temporales
-
-Una de las potenciales limitaciones que puede afectar a la modelización de series temporales son las observaciones extremas, también conocidas como *outliers*, se la define como aquellas observaciones que se alejan del patrón regular de los datos, es decir que sobresalen notoriamente del resto de las observaciones. Muchas veces es común no tenerlos en cuenta en la modelización de la serie porque pueden afectar seriamente los resultados del análisis, pudiendo sugerir modelos no apropiados y de esa forma alterar los pronósticos, este no es el caso dado que si eliminamos del conjunto de datos aquellas observaciones se elimina información vital para el entendimiento de cuando ocurre el evento disruptivo y su posterior recuperación.
-
-
 ## ARIMA/SARIMA
 
 Los modelos ARIMA (*AutoRegressive Integrated Moving Average*) representan uno de los enfoques más utilizados y consolidados para el análisis y pronóstico de series temporales univariadas. Estos están compuestos por tres componentes esenciales: la parte autorregresiva (AR), el término integrado o de diferenciación (I) y la parte promedio móvil (MA). El modelo general se expresa como: 
@@ -272,6 +267,8 @@ donde $0 < \alpha < 1$.
 
 Una forma alternativa de representar el modelo es con la forma de componentes, para el suavizado exponencial simple, la única componente que se incluye es el nivel, denotado como $\ell_t$. Estas representaciones de lo métodos de suavizado exponencial comprenden una ecuación de pronóstico y una ecuación de suavizado para cada uno de los componentes incluidos en el método. La forma de componentes del suavizado exponencial simple viene dada por:
 
+\newpage
+
 - Ecuación de pronóstico: $\hat{y}_{T+h|T} = \ell_t$
 - Ecuación de suavizado: $\ell_t = \alpha y_t + (1-\alpha)\ell_{t-1}$
 
@@ -280,6 +277,34 @@ Una forma alternativa de representar el modelo es con la forma de componentes, p
 donde $\ell_t$ es el nivel (o el valor suavizado) de la serie en el tiempo $t$. Estableciendo $h=1$, se obtienen los valores ajustados, mientras que al establecer $t = T$, se obtienen los pronóstico reales, más allá de los datos de entrenamiento.
 
 \setlength{\parindent}{1.5em}
+
+Ahora bien, la ecuación de suavizado puede reorganizarse para obtener una representación conocida como forma de "corrección de error". Partiendo de:
+
+\setlength{\parskip}{0.1em}
+
+$$\ell_t = \alpha y_t + (1-\alpha)\ell_{t-1}$${#eq-suavizado}
+
+\setlength{\parindent}{0pt}
+
+se obtiene: 
+
+\setlength{\parindent}{1.5em}
+
+$$\ell_t = \ell_{t-1} + \alpha(y_t - \ell_{t-1}) = \ell_{t-1} + \alpha\varepsilon_t$${#eq-suavizado2}
+
+\setlength{\parindent}{0pt}
+
+donde $\varepsilon_t = y_t - \ell_{t-1} = y_t - \hat{y}_t$ es el residuo en el tiempo $t$.
+
+\setlength{\parindent}{1.5em}
+
+Para que esto se convierta en un modelo totalmente especificado es necesario indicar los supuestos distribucionales de los errores, los cuales son: $\varepsilon_t \underset{iid}{\sim} \mathcal{N}(0, \sigma^2_{\varepsilon})$ el modelo puede escribirse como:
+
+$$y_t = \ell_{t-1} + \varepsilon_t$${#eq-suavizado3}
+
+$$\ell_t = \ell_{t-1} + \alpha\varepsilon_t$${#eq-suavizado4}
+
+\setlength{\parskip}{0.6em}
 
 Con respecto a la estimación de los parámetros, una opción puede ser elegir los valores de los parámetros de forma subjetiva (o en base a la experiencia previa). Sin embargo, una forma más fiable y objetiva de obtener valores para los parámetros desconocidos es estimarlos a partir de los datos observados utilizando algún método de estimación, como puede ser mediante la minimización de la suma de cuadrados de los errores (SCE).
 
@@ -305,6 +330,18 @@ De forma análoga al Suavizado exponencial simple, la ecuación de nivel puede i
 
 En este modelo, la función de pronóstico deja de ser constante y pasa a ser lineal en el horizonte de predicción. Es decir, el pronóstico a $h$ pasos se obtiene sumando al último nivel estimado $\ell_t$ el producto entre $h$ y la última estimación de la tendencia $b_t$. En consecuencia, los pronósticos resultan ser una función lineal creciente (o decreciente) en función del horizonte $h$.
 
+Para este modelo se considera que $\varepsilon_t = y_t - (\ell_{t-1} + b_{t-1})$, $\varepsilon_t \underset{iid}{\sim} \mathcal{N}(0, \sigma^2_{\varepsilon})$ y siguiendo los pasos de la especificación anterior se obtiene:
+
+\setlength{\parskip}{0.1em}
+
+$$y_t = \ell_{t-1} + b_{t-1} + \varepsilon_t$${#eq-holt1}
+
+$$\ell_t = \ell_{t-1} + b_{t-1} + \alpha\varepsilon_t$${#eq-holt2}
+
+$$b_t = b_{t-1} + \alpha\beta^*\varepsilon_t$${#eq-holt3}
+
+\setlength{\parskip}{0.6em}
+
 \vspace{0.2cm}
 
 **Método aditivo de Holt-Winters - ETS(A,A,A)**
@@ -316,7 +353,7 @@ El método aditivo de Holt-Winters extiende el método lineal de Holt con el obj
 - Ecuación de pronóstico: $\hat{y}_{T+h|T} = \ell_t + hb_t + s_{t+h-m(k+1)}$
 - Ecuación de nivel: $\ell_t = \alpha(y_t - s_{t-m}) + (1-\alpha)(\ell_{t-1} + b_{t-1})$
 - Ecuación de tendencia: $b_t = \beta^*(\ell_t - \ell_{t-1}) + (1-\beta^*)b_{t-1}$
-- Ecuación de estacionalidad: $\gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)s_{t-m}$
+- Ecuación de estacionalidad: $s_t = \gamma(y_t - \ell_{t-1} - b_{t-1}) + (1-\gamma)s_{t-m}$
 
 \setlength{\parindent}{0pt}
 
@@ -325,6 +362,20 @@ donde $k$ es la parte entera de $\frac{h-1}{m}$, lo que garantiza que los índic
 \setlength{\parindent}{1.5em}
 
 Aquí, la ecuación de nivel representa un promedio ponderado entre la observación desestacionalizada $(y_t - s_{t-m})$ y el pronóstico no estacional correspondiente al período $t$, dado por $(\ell_{t-1} + b_{t-1})$. La ecuación de tendencia coincide con el método lineal de Holt. Por su parte, la ecuación estacional expresa un promedio ponderado entre el índice estacional actual, $(y_t - \ell_{t-1} - b_{t-1})$, y el índice correspondiente a la misma estación del ciclo anterior.
+
+Para este modelo se considera que $\varepsilon_t = y_t - (\ell_{t-1} + b_{t-1} + s_{t-m})$, $\varepsilon_t \underset{iid}{\sim} \mathcal{N}(0, \sigma^2_{\varepsilon})$ y siguiendo los pasos de la especificación anterior se obtiene:
+
+\setlength{\parskip}{0.1em}
+
+$$y_t = \ell_{t-1} + b_{t-1} + s_{t-m} + \varepsilon_t$${#eq-holtw1}
+
+$$\ell_t = \ell_{t-1} + b_{t-1} + \alpha\varepsilon_t$${#eq-holtw2}
+
+$$b_t = b_{t-1} + \alpha\beta^*\varepsilon_t$${#eq-holtw3}
+
+$$s_t = s_{t-m} + \gamma\varepsilon_t$${#eq-holtw4}
+
+\setlength{\parskip}{0.6em}
 
 Los modelos presentados previamente permiten capturar distintas configuraciones estructurales de la serie, tales como nivel, tendencia y estacionalidad. Cabe destacar que existen múltiples combinaciones posibles dependendiendo de como ingresa cada componente al modelo, si de forma aditiva, multiplicativa o no ingresando. 
 
@@ -346,8 +397,6 @@ El enfoque clásico de intervención fue introducido por Box y Tiao (1975) y com
 
 1. un modelo de regresión, que incorpora variables explicativas para representar el efecto del *shock*, y
 2. un modelo ARIMA para los errores, que captura la dependencia temporal residual.
-
-\newpage
 
 La estructura general se expresa como:
 
@@ -379,7 +428,7 @@ Los métodos contrafactuales abordan el problema desde una perspectiva distinta:
 
 ### Establecer como faltante (*set to missing*)
 
-La técnica "*Set to Missing*" consiste en identificar el período de interrupción en la serie temporal y marcar esas observaciones como valores perdidos, para luego ajustar el modelo sólo con los datos disponibles fuera del período interrumpido. De este modo, el modelo no utiliza información contaminada por la interrupción y genera pronósticos que representan lo que habría ocurrido sin el evento disruptivo.
+La técnica "*Set to Missing*" consiste en identificar el período de interrupción en la serie temporal y marcar esas observaciones como valores perdidos, para luego ajustar el modelo sólo con los datos disponibles fuera del período interrumpido. De este modo, el modelo no utiliza información contaminada por la interrupción y genera pronósticos que representan lo que habría ocurrido sin el evento disruptivo. En este trabajo, los modelos ajustados bajo este enfoque corresponden a modelos ARIMA/SARIMA, la diferencia a la primer estrategia está en que datos se consideran al momento del ajuste.
 
 Cabe destacar que los pronósticos generados para el período de disrupción no serán precisos, pero pueden interpretarse como escenarios contrafactuales. Por otro lado, los pronósticos posteriores a la disrupción tienden a ser más estables, dado que no se ven afectados por observaciones atípicas o ruidosas.
 
@@ -396,7 +445,7 @@ Este enfoque reconstruye el período de interrupción utilizando únicamente inf
 
 - utilizar los datos del período pre-disruptivo para estimar las observaciones durante el período disruptivo haciendo uso de alguna medida resumen (media, mediana, entre otras).
 
-Una vez obtenidas estas estimaciones, los valores reconstruidos se incorporan a la serie y se ajusta un modelo sobre el conjunto completo de datos, permitiendo así realizar pronósticos posteriores a la interrupción con mayor estabilidad.
+Una vez obtenidas estas estimaciones, los valores reconstruidos se incorporan a la serie y se ajusta un modelo sobre el conjunto completo de datos, permitiendo así realizar pronósticos posteriores a la interrupción con mayor estabilidad. Los modelos utilizado en este enfoque son ARIMA/SARIMA la diferencia con respecto a *set to missing* está en que en este enfoque los datos no se ignoran, sino que se reconstruye el período.
 
 Sin embargo, es importante notar que los valores estimados durante la interrupción no constituyen pronósticos genuinos en sentido estricto, ya que se habrán utilizado información futura para calcular los datos ajustados durante la interrupción. No obstante, los pronósticos posteriores a la interrupción sí serán pronósticos verdaderos y deberían ser prácticamente iguales a los obtenidos con la estrategia anterior (*set to missing*).
 
@@ -421,7 +470,7 @@ $$\tilde{y}_{T+h|T} = \sum_{i=1}^{N} w_{T+h|T, i} \cdot \hat{y}_{T+h|T, i}$${#eq
 
 \setlength{\parindent}{0pt}
 
-donde $\tilde{y}_{T+h|T}$ es el pronóstico del ensemble h pasos hacia adelante, $w_{T+h|T, i}$ el peso asignado al i-ésimo modelo de pronóstico, el cual es el mismo para todos los modelos y $\hat{y}_{T+h|T, i}$ es el i-ésimo modelo de pronóstico. 
+donde $\tilde{y}_{T+h|T}$ es el pronóstico del ensemble h pasos hacia adelante, $w_{T+h|T, i}$ el peso asignado al i-ésimo modelo de pronóstico, el cual es el mismo para todos los modelos y cuya suma da 1, y $\hat{y}_{T+h|T, i}$ es el i-ésimo modelo de pronóstico. 
 
 \setlength{\parindent}{1.5em}
 
@@ -431,7 +480,17 @@ $$\tilde{F}(y_{T+h}|I_T) = \sum_{i=1}^{N} w_{T+h|T, i} \cdot F_i(y_{T+h}|I_T)$${
 
 \setlength{\parindent}{0pt}
 
-donde $\tilde{F}(y_{T+h}|I_T)$ es la función de distribución combinada para la variable $y$ en el instante $T+h$, usando la información disponible hasta $T$, $w_{T+h|T, i}$ el peso asignado al i-ésimo modelo de pronóstico, el cual es el mismo para todos los modelos y $F_i(y_{T+h}|I_T)$ es la función de distribución para la variable $y$ en el instante $T+h$, usando la información disponible hasta $T$, del i-ésimo modelo de pronóstico.
+donde $\tilde{F}(y_{T+h}|I_T)$ es la función de distribución combinada para la variable $y$ en el instante $T+h$, usando la información disponible hasta $T$, $w_{T+h|T, i}$ el peso asignado al i-ésimo modelo de pronóstico, el cual es el mismo para todos los modelos y cuya suma da 1, y $F_i(y_{T+h}|I_T)$ es la función de distribución para la variable $y$ en el instante $T+h$, usando la información disponible hasta $T$, del i-ésimo modelo de pronóstico.
+
+\setlength{\parindent}{1.5em}
+
+Una vez obtenida la distribución predictiva combinada, los intervalos de predicción pueden interpretarse, de manera general, mediante la expresión:
+
+$$\tilde{y}_{T+h|T} \pm c \cdot \tilde{\sigma}_h$${#eq-intpred}
+
+\setlength{\parindent}{0pt}
+
+donde $c$ depende de la probabilidad de cobertura deseada para calcular el intervalo de predicción y $\tilde{\sigma}_h$ representa una estimación del desvío estándar de la distribución predictiva combinada $h$ pasos hacia adelante. No obstante, en esta tesina los intervalos de predicción no se calculan bajo un supuesto paramétrico de normalidad, sino a partir de los cuantiles empíricos de la distribución predictiva obtenida mediante simulaciones de los distintos modelos que integran el *ensemble*.
 
 \setlength{\parindent}{1.5em}
 
@@ -501,10 +560,11 @@ $${#eq-winkler2}
 
 ### Ajuste y evaluación de los modelos
 
-Dado que los eventos disruptivos producen cambios abruptos en la estructura temporal, el procedimiento de ajuste y evaluación de los modelos se llevará a cabo en base a un esquema con ventana expansiva (*expanding window*), el cual constituye un caso particular del enfoque de *rolling forecasting origin* utilizado en la literatura de series temporales (Hyndman y Athanasopoulos, 2021). Este método consiste en estimar el modelo utilizando observaciones hasta un tiempo $t$, generar pronósticos para $t+1$, y posteriormente ampliar el conjunto de entrenamiento incorporando las nuevas observaciones disponibles, y se repite el proceso hasta realizarlo en cada una de las ventanas definidas. 
+Dado que los eventos disruptivos producen cambios abruptos en la estructura temporal, el procedimiento de ajuste y evaluación de los modelos se llevará a cabo en base a un esquema con ventana expansiva (*expanding window*), el cual constituye un caso particular del enfoque de *rolling forecasting origin* utilizado en la literatura de series temporales (Hyndman y Athanasopoulos, 2021).
+
+Bajo este enfoque, el procedimiento consiste en definir un origen de pronóstico, es decir, el período hasta el cual se ajustarán los modelos, y un horizonte de pronóstico de 12 meses. A partir de ello, en cada ventana se ajustan los distintos modelos utilizando toda la información disponible hasta el origen definido, para luego generar los pronósticos correspondientes. Posteriormente, el origen se desplaza 12 meses hacia adelante y el proceso se repite de manera iterativa, permitiendo obtener pronósticos de todos los modelos en cada una de las ventanas consideradas. La siguiente figura presenta una representación ilustrativa de este procedimiento.
 
 ![Proceso ilustrativo de ajuste y evaluación de los modelos](Imgs/grafico_ventana.png){#fig-ventanaexp}
-
 
 \newpage
 
@@ -956,7 +1016,9 @@ g6_graf_pronosticos(ajuste4$pronostico, 2024, 80, color = "#02A144")
 
 ### Ensemble
 
-En este enfoque se propone una estrategia de combinación de pronósticos, integrando las cuatro metodologías consideradas mediante un promedio simple. Esta aproximación busca aprovechar la información complementaria de cada modelo, reduciendo la variabilidad individual y mejorando la robustez de las predicciones. (Agregar como se construye los intervalo de prediccion)
+En este enfoque se propone una estrategia de combinación de pronósticos, integrando las cuatro metodologías consideradas mediante un promedio simple. Esta aproximación busca aprovechar la información complementaria de cada modelo, reduciendo la variabilidad individual y mejorando la robustez de las predicciones.
+
+Para la construcción de los intervalos de predicción, se generan múltiples trayectorias simuladas para cada uno de los modelos individuales y posteriormente se combinan en una única distribución predictiva conjunta. A partir de esta distribución, los intervalos se obtienen mediante cuantiles empíricos asociados al nivel de cobertura seleccionado, en este caso 80%, permitiendo reflejar tanto la incertidumbre propia de cada modelo como la variabilidad derivada de la estrategia de combinación.
 
 Tal como se observa en la @fig-pronostico6, los pronósticos obtenidos mediante esta estrategia presentan una adaptación más rápida frente a los cambios abruptos en comparación con los enfoques individuales, lo cual constituye una evidencia de su capacidad para responder ante fases tempranas de eventos disruptivos. Asimismo, en las ventanas de pronóstico posteriores, los valores estimados se mantienen cercanos a los observados, reflejando un desempeño consistente a lo largo del tiempo.
 
@@ -1105,9 +1167,19 @@ Cabe aclarar que, si bien los modelos ARIMA/SARIMA presentan un mejor comportami
 
 # Conclusión
 
-En la presente investigación se propuso evaluar diversas estrategias para la modelización y pronóstico de series temporales interrumpidas, utilizando como caso de estudio el flujo de pasajeros del Transporte Urbano de Rosario (TUP) durante el impacto de la pandemia de COVID-19. 
+La presente investigación permitió evaluar diversas estrategias para la modelización y pronóstico de series temporales interrumpidas, utilizando como caso de estudio el flujo de pasajeros del Transporte Urbano de Rosario (TUP) durante el impacto de la pandemia de COVID-19. 
 
-Tras el análisis comparativo de los enfoques aplicados, se obtiene que no hay ningún enfoque óptimo para aplicar en todos los contextos, sino que hay métodos que funcionan mejores que otros en ciertas etapas de pronóstico, como por ejemplo, los métodos contrafactuales y combinación que presentaron mejores resultados en términos de capacidad predictiva en fases tempranas de recuperación del evento disruptivo. Por lo que la elección de los distintos enfoques va a estar dada dependiendo que año se quiere pronosticar.
+Los resultados obtenidos evidencian que los modelos tradicionales ARIMA/SARIMA, si bien constituyen una herramienta sólida y ampliamente utilizada, presentan limitaciones importantes frente a eventos disruptivos. En particular, durante el período donde ocurre la disrupción y la etapa de recuperación, estos modelos mostraron una menor capacidad de adaptación a los nuevos patrones de comportamiento de la demanda, reflejado en mayores errores de predicción.
+
+Por el contrario, los modelos altamente adaptativos (ETS) demostraron una mejor capacidad para ajustarse a las variaciones recientes de la serie, capturando con mayor rapidez las modificaciones en la tendencia y en la estacionalidad. Esta característica permitió obtener pronósticos más precisos durante las fases de recuperación y estabilización, especialmente en contextos donde los patrones históricos dejaron de ser representativos del comportamiento futuro.
+
+Asimismo, los modelos de intervención permitieron incorporar explícitamente el efecto del *shock* y su posterior recuperación mediante variables explicativas. Aún así los resultados reflejan una poca capacidad de adaptación de los mismos ante situaciones críticas.
+
+Por otro lado, los enfoques contrafactuales aportaron una perspectiva distinta al análisis, permitiendo reconstruir escenarios alternativos acerca de cómo habría evolucionado la demanda del transporte urbano. Ambas estrategias mostraron ventajas para reducir la influencia de observaciones extremadamente atípicas durante el ajuste de los modelos, contribuyendo a generar pronósticos más estables en el período posterior a la interrupción.
+
+Por último, los resultados obtenidos utilizando la estrategia de combinación (*ensemble*) muestran un desempeño altamente competitivo y robusto frente a los distintos escenarios considerados. Dicha combinación permitió mitigar debilidades individuales de cada modelo y potenciar las fortalezas de cada uno de ellos, resultando en una de las estrategias más adecuadas para aplicar ante situaciones extremas.
+
+Sin embargo, el análisis comparativo realizado pone de manifiesto que el rendimiento de las distintas metodologías varía considerablemente según la etapa del período disruptivo analizado. En consecuencia, no puede afirmarse la existencia de un método óptimo en términos generales, sino más bien de enfoques relativamente más adecuados dependiendo de la fase considerada.
 
 En concordancia con los desarrollos recientes de Hyndman y Rostami-Tabar (2024), esta investigación confirma que, en contextos de series interrumpidas, la prioridad debe desplazarse de la "pureza estadística" de los residuos hacia la adaptabilidad del pronóstico. Se observó que, aunque algunos enfoques presentaban ciertas desviaciones en los supuestos de normalidad o independencia de residuos (producto de la volatilidad extrema del periodo), su desempeño predictivo fue superior. Esto sugiere que la capacidad de un modelo para ajustarse a una "nueva normalidad" es más valiosa para el planificador que el estricto cumplimiento de los supuestos clásicos en escenarios de crisis.
 
@@ -1115,9 +1187,13 @@ En concordancia con los desarrollos recientes de Hyndman y Rostami-Tabar (2024),
 
 # Aporte y futuras líneas
 
-Desde una perspectiva política y social, este trabajo aporta herramientas concretas para el **Ente de la Movilidad de Rosario (EMR)**, contribuyendo no solo a una estimación más precisa de la demanda ante situaciones extremas, sino también al proceso de toma de decisiones estratégicas y operativas. En particular, la adopción de distintos enfoques de pronóstico permite una planificación más informada del servicio, facilitando la asignación eficiente de recursos, la programación de frecuencias y la adaptación ante cambios abruptos en la demanda. Esto se traduce en una optimización del uso de unidades, una reducción de costos operativos y una mejora potencial en la calidad del servicio ofrecido a los usuarios.
+La principal contribución de esta tesina consiste en realizar una evaluación comparativa de distintas estrategias de pronóstico aplicadas a series temporales interrumpidas, utilizando un caso de estudio real y de relevancia social como lo es la movilidad urbana en la ciudad de Rosario durante y después de la pandemia de COVID-19.
 
-Como extensión de esta investigación, se sugiere explorar la incorporación de variables exógenas relevantes que permitan enriquecer la modelización, así como evaluar el uso de modelos de aprendizaje automático (Machine Learning), con el objetivo de capturar dinámicas no lineales tanto en la fase de recuperación como en el largo plazo.
+Desde una perspectiva política y social, los resultados obtenidos proporcionan herramientas concretas para organismos de planificación y gestión del transporte urbano, particularmente para el **Ente de la Movilidad de Rosario (EMR)**. La identificación de metodologías más robustas frente a shocks exógenos permite mejorar la capacidad de respuesta ante situaciones extraordinarias, facilitando al proceso de toma de decisiones estratégicas y operativas.
+
+Además, el trabajo evidencia que los cambios producidos por la pandemia no constituyen únicamente perturbaciones transitorias, sino que pueden generar modificaciones persistentes en los patrones de movilidad urbana.
+
+Como extensión de esta investigación, se sugiere explorar la incorporación de variables exógenas relevantes que permitan enriquecer la modelización, así como evaluar el uso de modelos de aprendizaje automático (*Machine Learning*) y aprendizaje profundo (*Deep Learning*), como por ejemplo, *Random Forest*, *XGBoost*, redes neuronales recurrentes (RNN), entre otras. Con el objetivo de capturar dinámicas no lineales tanto en la fase de recuperación como en el largo plazo.
 
 \newpage
 
