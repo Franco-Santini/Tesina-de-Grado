@@ -268,3 +268,28 @@ resultados <- function(ajuste, anio, conf_level){
   
   metricas
 }
+
+# Ljung-Box 
+ljung_box_arima <- function(ajuste, id, lag){
+  test <- ajuste$modelos |>
+    filter(.id == id) |> 
+    dplyr::select(arima) |> 
+    augment() |>
+    dplyr::select(.innov) |> 
+    features(.innov, ljung_box, lag = lag) |> 
+    mutate(lag = lag, .id = id)
+  
+  data.frame(test)
+}
+
+ljung_box_ets <- function(ajuste, id, lag){
+  test <- ajuste$modelos |>
+    filter(.id == id) |> 
+    dplyr::select(ets) |> 
+    augment() |>
+    dplyr::select(.innov) |> 
+    features(.innov, ljung_box, lag = lag) |> 
+    mutate(lag = lag, .id = id)
+  
+  data.frame(test)
+}
