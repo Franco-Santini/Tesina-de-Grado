@@ -54,9 +54,9 @@ A todos ellos, muchas gracias.
 
 \section*{Resumen}
 
-Esta tesina investiga estrategias para la modelización y pronóstico de series temporales interrumpidas, tomando como caso de estudio el flujo de pasajeros del Transporte Urbano de Rosario afectado por la pandemia de COVID-19. Ante un shock de tal magnitud, los modelos estadísticos tradicionales enfrentan dificultades para capturar cambios estructurales abruptos. El trabajo evalúa y compara el desempeño de modelos ARIMA, modelos de suavizado exponencial (ETS), métodos de intervención y enfoques contrafactuales, además de proponer una combinación de pronósticos (*Ensemble*).
+Esta tesina investiga estrategias para la modelización y pronóstico de series temporales interrumpidas, tomando como caso de estudio el flujo de pasajeros del Transporte Urbano de Rosario afectado por la pandemia de COVID-19. Ante un *shock* de tal magnitud, los modelos estadísticos tradicionales enfrentan dificultades para capturar cambios estructurales abruptos. El trabajo evalúa y compara el desempeño de modelos ARIMA, modelos de suavizado exponencial (ETS), métodos de intervención y enfoques contrafactuales, además de proponer una combinación de pronósticos (*Ensemble*).
 
-Los resultados indican que, durante el periodo de recuperación (2021-2022), los modelos altamente adaptativos (ETS) y el método de combinación superaron significativamente a las estructuras rígidas de ARIMA, demostrando menores errores de predicción en términos de RMSE y MAE. Se concluye que, ante eventos disruptivos, la capacidad de ajuste local y la adaptabilidad de los modelos son criterios más determinantes para la precisión del pronóstico que el cumplimiento estricto de los supuestos clásicos de ruido blanco. Estos hallazgos proporcionan una herramienta valiosa para la gestión pública y la planificación del transporte en contextos de incertidumbre, permitiendo al Ente de la Movilidad de Rosario realizar proyecciones más robustas, resilientes y ajustadas a la dinámica social de la ciudad.
+Los resultados indican que, durante el periodo de recuperación (2021-2022), los modelos altamente adaptativos (ETS) y el método de combinación mostraron ventajas por sobre las estructuras rígidas de ARIMA, demostrando menores errores de predicción en términos de RMSE y MAE. Se concluye que, ante eventos disruptivos, la capacidad de ajuste local y la adaptabilidad de los modelos son criterios más determinantes para la precisión del pronóstico que el cumplimiento estricto de los supuestos clásicos de ruido blanco. Estos hallazgos aportan evidencia empírica sobre el desempeño de distintas estrategias de pronóstico en series temporales interrumpidas y constituyen una herramienta de apoyo para la toma de decisiones y la planificación del transporte urbano en contextos de elevada incertidumbre y cambios estructurales.
 
 \setlength{\parindent}{0pt}
 
@@ -159,7 +159,7 @@ La autocorrelación es una medida de asociación que mide la correlación entre 
 
 #### Función de Autocorrelación
 
-La Función de Autocorrelación (ACF, por sus siglas en inglés) constituye una herramienta fundamental en el análisis de series temporales, ya que permite cuantificar el grado de asociación lineal entre los valores de la serie y sus propios valores pasados a distintos rezagos. Formalmente, la autocorrelación correspondiente a un rezago $k$ se define mediante la siguiente expresión:
+La Función de Autocorrelación (ACF, por sus siglas en inglés) es un recurso ampliamente utilizado en el análisis de series temporales, ya que permite cuantificar el grado de asociación lineal entre los valores de la serie y sus propios valores pasados a distintos rezagos. Formalmente, la autocorrelación correspondiente a un rezago $k$ se define mediante la siguiente expresión:
 
 $$\rho_k = \frac{Cov(y_t, y_{t+k})}{\sqrt{Var(y_t)}\sqrt{Var(y_{t+k})}} = \frac{\gamma_k}{\gamma_0}$${#eq-autocor}
 
@@ -173,7 +173,7 @@ El coeficiente $\rho_k$ varía de -1 a 1. Si $\rho_k$ esta cerca de 1 indica que
 
 #### Función de Autocorrelación Parcial
 
-La Función de Autocorrelación Parcial (PACF, por sus siglas en inglés) es una herramienta clave en el análisis de series temporales que permite medir la relación lineal directa entre una observación y su valor rezagado $k$, eliminando previamente el efecto de los rezagos intermedios $1, 2, ..., k-1$. A diferencia de la Función de Autocorrelación (ACF), que capta tanto efectos directos como indirectos entre los valores de la serie, la PACF aísla exclusivamente la contribución propia de cada rezago. La expresión de la autocorrelación parcial correspondiente al rezago $k$ resulta:
+La Función de Autocorrelación Parcial (PACF, por sus siglas en inglés) permite medir la relación lineal directa entre una observación y su valor rezagado $k$, eliminando previamente el efecto de los rezagos intermedios $1, 2, ..., k-1$. A diferencia de la Función de Autocorrelación (ACF), que capta tanto efectos directos como indirectos entre los valores de la serie, la PACF aísla exclusivamente la contribución propia de cada rezago. La expresión de la autocorrelación parcial correspondiente al rezago $k$ resulta:
 
 $$\phi_{kk} = Corr(y_t, y_{t+k}|y_{t+1}, y_{t+2},...,y_{t+k-1})$${#eq-pacf}
 
@@ -206,8 +206,6 @@ $$\phi_p(B) y_t = \varepsilon_t$${#eq-ar}
 
 Este enfoque es análogo a una regresión lineal múltiple, con la particularidad de que los predictores corresponden a valores rezagados de $y_t$. Este enfoque se denomina modelo autorregresivo $AR(p)$, que se formula, en general, para series estacionarias y exige determinadas restricciones sobre sus parámetros. Por definición, un proceso $AR(p)$ es siempre invertible, pero para que sea estacionario es necesario que las raíces de $\phi_p(B) = 0$ caigan fuera del círculo unitario.
 
-\newpage
-
 La componente promedio móvil refleja la dependencia entre el valor actual de la serie y los errores de pronósticos previos, por lo que un proceso promedio móvil de orden $q$ se lo puede escribir como:
 
 $$y_t = \theta_q(B)\varepsilon_t$${#eq-ma}
@@ -237,7 +235,7 @@ En cada iteración, los modelos candidatos son estimados mediante máxima verosi
 
 ![Ejemplo ilustrativo del proceso iterativo de búsqueda de los parámetros del algoritmo de Hyndman-Khandakar.](Imgs/algoritmo_hk.png){#fig-algoritmohk}
 
-Si bien los modelos ARIMA y SARIMA constituyen un punto de partida indispensable, presentan limitaciones importantes cuando la serie contiene eventos disruptivos abruptos. Bajo estas circunstancias, los parámetros estimados a partir de datos previos a la disrupción pueden no reflejar adecuadamente el comportamiento posterior. Asimismo, la adaptación del modelo al patrón estacional posterior puede ser lenta o inestable.
+Si bien los modelos ARIMA y SARIMA constituyen un punto de partida indispensable, presentan limitaciones importantes cuando la serie contiene eventos disruptivos. Bajo estas circunstancias, los parámetros estimados a partir de datos previos a la disrupción pueden no reflejar adecuadamente el comportamiento posterior. Asimismo, la adaptación del modelo al patrón estacional posterior puede ser lenta o inestable.
 
 Por estas razones, en este trabajo los modelos ARIMA y SARIMA se consideran como modelos de referencia (*baseline*) para la comparación con enfoques diseñados explícitamente para capturar interrupciones, tal como proponen Hyndman y Rostami-Tabar (2024).
 
@@ -317,7 +315,7 @@ donde $\varepsilon_t = y_t - \ell_{t-1} = y_t - \hat{y}_t$ es el residuo en el t
 
 \setlength{\parindent}{1.5em}
 
-Para que esto se convierta en un modelo totalmente especificado es necesario indicar los supuestos distribucionales de los errores, los cuales son: $\varepsilon_t \underset{iid}{\sim} \mathcal{N}(0, \sigma^2_{\varepsilon})$ el modelo puede escribirse como:
+Para que esto se convierta en un modelo totalmente especificado es necesario indicar los supuestos distribucionales de los errores, los cuales son: $\varepsilon_t \underset{iid}{\sim} \mathcal{N}(0, \sigma^2_{\varepsilon})$ y por lo tanto, el modelo puede escribirse como:
 
 $$y_t = \ell_{t-1} + \varepsilon_t$${#eq-suavizado3}
 
@@ -400,9 +398,7 @@ Los modelos presentados previamente permiten capturar distintas configuraciones 
 
 Con el fin de determinar la especificación más adecuada se utilizará la función `ETS()` del paquete `fable`, que permite hacer una selección automática del modelo ajustado, seleccionando aquel modelo que minimice el/los criterio/s de información $AICc$, $AIC$ o $BIC$. 
 
-Sin embargo, tal como señalan Hyndman y Rostami-Tabar (2024), los ETS presentan limitaciones ante *shocks* abruptos. En particular, necesitan un período de ajuste para que sus parámetros se estabilicen luego de una interrupción abrupta, lo que puede derivar en pronósticos inestables o con mayor variabilidad durante y después del evento.
-
-A pesar de ello, su simplicidad y adaptabilidad hacen que constituyan un componente valioso dentro del conjunto de estrategias para series interrumpidas, funcionando como una opción más simple a enfoques más estructurales o contrafactuales.
+Sin embargo, tal como señalan Hyndman y Rostami-Tabar (2024), los modelos ETS presentan limitaciones frente a *shocks* abruptos. En particular, requieren un período de adaptación para que sus parámetros reflejen adecuadamente la nueva dinámica de la serie, lo que puede generar pronósticos más inestables durante y después de la interrupción. No obstante, su capacidad para ajustarse rápidamente a los cambios observados y su simplicidad de implementación los convierten en una excelente alternativa dentro del conjunto de metodologías consideradas para el análisis de series temporales interrumpidas.
 
 ## Modelos de intervención
 
@@ -447,7 +443,7 @@ Los métodos contrafactuales abordan el problema desde una perspectiva distinta:
 
 ### Establecer como faltante (*set to missing*)
 
-La técnica "*Set to Missing*" consiste en identificar el período de interrupción en la serie temporal y marcar esas observaciones como valores perdidos, para luego ajustar el modelo sólo con los datos disponibles fuera del período interrumpido. De este modo, el modelo no utiliza información contaminada por la interrupción y genera pronósticos que representan lo que habría ocurrido sin el evento disruptivo. En este trabajo, los modelos ajustados bajo este enfoque corresponden a modelos ARIMA/SARIMA, la diferencia a la primer estrategia está en que datos se consideran al momento del ajuste.
+La técnica "*Set to Missing*" consiste en identificar el período de interrupción en la serie temporal y marcar esas observaciones como valores perdidos, para luego ajustar el modelo sólo con los datos disponibles fuera del período interrumpido. De este modo, el modelo no utiliza información contaminada por la interrupción y genera pronósticos que representan lo que habría ocurrido sin el evento disruptivo. En este trabajo, los modelos ajustados bajo este enfoque corresponden a modelos ARIMA/SARIMA, la diferencia respecto de la primera estrategia está en que datos se consideran al momento del ajuste.
 
 Cabe destacar que los pronósticos generados para el período de disrupción no serán precisos, pero pueden interpretarse como escenarios contrafactuales. Por otro lado, los pronósticos posteriores a la disrupción tienden a ser más estables, dado que no se ven afectados por observaciones atípicas o ruidosas.
 
@@ -466,7 +462,7 @@ Este enfoque reconstruye el período de interrupción utilizando únicamente inf
 
 Una vez obtenidas estas estimaciones, los valores reconstruidos se incorporan a la serie y se ajusta un modelo sobre el conjunto completo de datos, permitiendo así realizar pronósticos posteriores a la interrupción con mayor estabilidad. Los modelos utilizados en este enfoque son ARIMA/SARIMA la diferencia con respecto a *set to missing* está en que en este enfoque los datos no se ignoran, sino que se reconstruye el período.
 
-Sin embargo, es importante notar que los valores estimados durante la interrupción no constituyen pronósticos genuinos en sentido estricto, ya que se habrá utilizado información futura para calcular los datos ajustados durante la interrupción. No obstante, los pronósticos posteriores a la interrupción sí serán pronósticos verdaderos y deberían ser prácticamente iguales a los obtenidos con la estrategia anterior (*set to missing*).
+Sin embargo, es importante notar que los valores estimados durante la interrupción no constituyen pronósticos genuinos en sentido estricto, ya que se habrá utilizado información futura para calcular los datos ajustados durante la interrupción. No obstante, los pronósticos posteriores a la interrupción sí constituyen pronósticos genuinos y deberían presentar diferencias mínimas respecto de los obtenidos mediante la estrategia anterior (*set to missing*).
 
 ## Métodos de combinación (*ensemble*)
 
@@ -525,7 +521,7 @@ Con el fin de comparar el desempeño de los modelos propuestos, es necesario def
 
 ### Raíz del error cuadrático medio (RMSE)
 
-Es una medida directa del error de predicción en las mismas unidades que la variable de respuesta, representa la raíz cuadrada del promedio de las diferencias al cuadrado entre los valores observados y los valores predichos. Valores bajos indican un mejor desempeño predictivo. Su expresión resulta:
+Es una medida directa del error de predicción en las mismas unidades que la variable respuesta, representa la raíz cuadrada del promedio de las diferencias al cuadrado entre los valores observados y los valores predichos. Valores bajos indican un mejor desempeño predictivo. Su expresión resulta:
 
 $$RMSE(\hat{y}, y) = \sqrt{\frac{1}{n}\sum_{i=1}^{n} \left( y_i - \hat{y}_i \right)^2}$${#eq-rmse}
 
@@ -581,7 +577,7 @@ $${#eq-winkler2}
 
 Dado que los eventos disruptivos producen cambios abruptos en la estructura temporal, el procedimiento de ajuste y evaluación de los modelos se llevará a cabo en base a un esquema con ventana expansiva (*expanding window*), el cual constituye un caso particular del enfoque de *rolling forecasting origin* utilizado en la literatura de series temporales (Hyndman y Athanasopoulos, 2021).
 
-Bajo este enfoque, el procedimiento consiste en definir un origen de pronóstico, es decir, el período hasta el cual se ajustarán los modelos, y un horizonte de pronóstico de 12 meses. A partir de ello, en cada ventana se ajustan los distintos modelos utilizando toda la información disponible hasta el origen definido, para luego generar los pronósticos correspondientes. Posteriormente, el origen se desplaza 12 meses hacia adelante y el proceso se repite de manera iterativa, permitiendo obtener pronósticos de todos los modelos en cada una de las ventanas consideradas. La siguiente figura presenta una representación ilustrativa de este procedimiento.
+Bajo este enfoque, el procedimiento consiste en definir un origen de pronóstico, es decir, el período hasta el cual se ajustarán los modelos, y un horizonte de pronóstico de 12 meses. Se seleccionó este horizonte de pronóstico debido a que permite capturar un ciclo estacional completo de la serie. A partir de ello, en cada ventana se ajustan los distintos modelos utilizando toda la información disponible hasta el origen definido, para luego generar los pronósticos correspondientes. Posteriormente, el origen se desplaza 12 meses hacia adelante y el proceso se repite de manera iterativa, permitiendo obtener pronósticos de todos los modelos en cada una de las ventanas consideradas. La siguiente figura presenta una representación ilustrativa de este procedimiento.
 
 ![Proceso ilustrativo de ajuste y evaluación de los modelos](Imgs/grafico_ventana.png){#fig-ventanaexp}
 
@@ -591,6 +587,7 @@ Bajo este enfoque, el procedimiento consiste en definir un origen de pronóstico
 
 ```{r source}
 source("Código/Funciones.R") # Cargas las funciones a utilizar
+options(scipen = 999)
 ```
 
 ```{r datos transformados para las series}
@@ -623,9 +620,9 @@ El procedimiento se estructuró de acuerdo con los siguientes pasos:
 
 - Análisis de las características de la serie: Se examinaron las propiedades intrínsecas de la serie, incluyendo la identificación de tendencia, estacionalidad y período donde ocurre la disrupción, a través de herramientas visuales implementadas con la librería `ggplot2`.
 
-- Modelización y análisis del shock pandémico (2020), de la etapa de recuperación (2021-2022) y estabilización (2023–2024): Se ajustaron los modelos previamente seleccionados para capturar y pronosticar esta transición, empleando las librerías del paquete `fpp3`.
+- Modelización y análisis del *shock* pandémico (2020), de la etapa de recuperación (2021-2022) y estabilización (2023–2024): Se ajustaron los modelos previamente seleccionados para capturar y pronosticar esta transición, empleando las librerías del paquete `fpp3`.
 
-- Evaluación comparada de pronósticos: Se evaluó el desempeño de los diversos enfoques tanto durante la disrupción como en el período posterior, a través de métricas puntuales y probabilísticas, utilizando las librerias del paquete `fpp3`.
+- Evaluación comparada de pronósticos: Se evaluó el desempeño de los diversos enfoques tanto durante la disrupción como en el período posterior, a través de métricas puntuales y probabilísticas, utilizando las librerías del paquete `fpp3`.
 
 El propósito de esta aplicación es, por un lado, ofrecer un análisis riguroso de la evolución de la movilidad urbana en la ciudad de Rosario a lo largo de casi dos décadas y, por otro, generar evidencia empírica sólida que permita identificar qué estrategias de modelización resultan más adecuadas para el tratamiento de series temporales interrumpidas, caracterizadas por *shocks* abruptos y procesos de recuperación graduales.
 
@@ -669,12 +666,10 @@ g3_estacionalidad_anual(datos_series) + theme(
 ```
 
 
-
 Con respecto al análisis de dispersión, la @fig-serie3 muestra la distribución anual de los pasajeros transportados. En ella se puede identificar una leve disminución en la media a lo largo del tiempo, así como una variabilidad que no parece ser constante entre años. Este comportamiento sugiere la presencia de heterocedasticidad, es decir, cambios en la variabilidad de la serie a lo largo del tiempo. 
 
 Estos patrones constituyen un indicio de que la serie no es estacionaria, tanto en media como en varianza. En particular, la presencia de una tendencia y de cambios en la dispersión refuerza la necesidad de aplicar transformaciones y/o diferenciaciones para lograr una representación adecuada del proceso.
 
-Con el objetivo de estabilizar la varianza, se aplica una transformación de Box-Cox. El valor del parámetro $\lambda = 0$ fue seleccionado a partir de la minimización del coeficiente de variación en la @tbl-bc, lo cual conduce a la utilización de la transformación logarítmica, es decir, $y^{(\lambda)} = ln(y)$. Esta transformación permite reducir la heterogeneidad en la varianza y facilita la posterior modelización de la serie.
 
 ```{r graf 3}
 #| label: fig-serie3
@@ -687,7 +682,6 @@ g2_boxplot_disp(datos_series)
 
 ```{r}
 bc_transf <- boxcox(lm(data = datos_series, pasajeros ~ 1), plotit = F)
-
 
 # Coeficientes de variación
 # Con esto solo aplicamos las transformaciones 
@@ -712,12 +706,19 @@ bc <- data.frame(
 )
 ```
 
-```{r}
-#| label: tbl-bc
-#| tbl-cap: "Coeficiente de variación para cada parámetro de la transformación de Box-Cox."
+Con el objetivo de estabilizar la varianza de la serie, se consideró la aplicación de una transformación de Box-Cox. Inicialmente, se estimó el parámetro $\lambda$ utilizando el método "Guerrero" sobre la totalidad de las observaciones disponibles, obteniéndose un valor de $\hat\lambda = 1.3954$. Este resultado sugiere que no sería necesaria una transformación de la variable respuesta, ya que valores de $\lambda$ próximos a 1 implican trabajar sobre la escala original de los datos.
 
-bc |> 
-  kable(digits = 4, col.names = c("$\\lambda$", "Coeficiente de variación"))
+No obstante, dado que la serie presenta una interrupción asociada a la pandemia de COVID-19, es posible que la estimación de $\lambda$ se encuentre influenciada por dicho evento. Con el fin de evaluar esta situación, se estimó nuevamente el parámetro por separado para dos subperíodos: uno previo a la disrupción y otro posterior a ella. Los resultados obtenidos fueron $\hat\lambda = -0.15$ para el período previo y $\hat\lambda = 1.387$ para el período posterior.
+
+Dado que los resultados obtenidos no fueron consistentes entre ambos subperíodos y considerando que el objetivo principal es reducir la heterogeneidad de la varianza observada en la serie, se optó por utilizar la transformación de logaritmo natural $\lambda = 0$. Esta transformación permite atenuar las diferencias de escala generadas por el evento disruptivo, mejorar la estabilidad de la varianza y facilitar la posterior modelización e interpretación de los resultados.
+
+```{r}
+datos_pre_disr <- datos_series |> filter(mes_anio <= yearmonth("2020 feb"))
+datos_post_disr <- datos_series |> filter(mes_anio >= yearmonth("2020 mar"))
+
+lambda_guerrero_pre_disr <- forecast::BoxCox.lambda(datos_pre_disr$pasajeros, method = "guerrero", lower = -2, upper = 2)
+lambda_guerrero_post_disr <- forecast::BoxCox.lambda(datos_post_disr$pasajeros, method = "guerrero", lower = -2, upper = 2)
+lambda_guerrero <- forecast::BoxCox.lambda(datos_series$pasajeros, method = "guerrero")
 ```
 
 En cuanto a la estructura de dependencia temporal, la @fig-serie4 presenta la función de autocorrelación muestral, donde se observan valores positivos elevados en los primeros rezagos, con un decrecimiento gradual a medida que aumenta el rezago. Este patrón es característico de series no estacionarias o con fuerte dependencia temporal, lo que sugiere la necesidad de aplicar diferenciación para estabilizar la media.  
@@ -772,7 +773,7 @@ conf.lims <- c(-1,1)*qnorm((1 + alpha)/2)/sqrt(autocorrelacion_dif$n.used)
 ```
 
 
-Al aplicar la transformación correspondiente a la variable respuesta, en la @fig-serie6 se presenta la evolución temporal del logaritmo natural de los pasajeros expresado en cientos de miles, junto con su distribución anual. Se observa que el rango de la variable se reduce considerablemente, lo que contribuye a una mayor estabilidad en la varianza. Al analizar el comportamiento de la serie en los años de interés, se observa que hasta el año 2019, la variable parece ser estable en varianza pero no en media. Este comportamiento sugiere la conveniencia de aplicar una diferenciación en la serie, como estrategia para solucionar la no estacionariedad en media.
+Al aplicar la transformación correspondiente a la variable respuesta, en la @fig-serie6 se presenta la evolución temporal del logaritmo natural de los pasajeros expresado en cientos de miles, junto con su distribución anual. Se observa que el rango de la variable se reduce considerablemente, lo que contribuye a una mayor estabilidad en la varianza. Al analizar el comportamiento de la serie en los años de interés, se observa que hasta el año 2019, la variable parece ser estable en varianza pero no en media.
 
 ```{r graf 6}
 #| label: fig-serie6
@@ -922,6 +923,17 @@ $$x_{2,t} = \left\{\begin{matrix}
 0 & \text{en otro caso}\\
 \end{matrix}\right.$${#eq-segvarindicadora}
 
+```{r modelos_ajustados3}
+#| tbl-cap: "Modelos ajustados en cada fase"
+#| label: tbl-ajuste-mint
+
+data.frame(
+  entrenamiento = c("1", "2", "3", "4", "5"),
+  modelos = c("$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(0,1,1)(0,0,1)_{12}$", "$SARIMA(1,0,2)(0,0,2)_{12}$", "$SARIMA(1,0,2)(0,0,2)_{12}$", "$SARIMA(1,0,2)(0,0,2)_{12}$")
+) |> 
+  kable(col.names = c("Ventana", "Modelos ajustados"))
+```
+
 En este enfoque, se puede observar en la @fig-pronostico3 que estos modelos presentan limitaciones para adaptarse con rapidez al evento disruptivo, dado que en la fase de recuperación los pronósticos se encuentran muy lejos de los valores reales. Recién en la fase de estabilización, los pronósticos comienzan a aproximarse a la verdadera trayectoria de la serie.
 
 ```{r graf_pronosticos3}
@@ -948,7 +960,7 @@ g6_graf_pronosticos(ajuste2$pronostico, 2024, 80, color = "#AE00B8")
 
 #### Establecer como faltante (*set to missing*)
 
-En este enfoque, se establece como faltantes aquellas observaciones que pertenecen al período disruptivo comprendido entre Marzo de 2020 y Julio de 2021, afectando directamente a todas aquellas ventanas de entrenamiento y pronóstico que incluyan dicho intervalo.
+En este enfoque, se establece como faltantes aquellas observaciones que pertenecen al período disruptivo comprendido entre Marzo de 2020 y Julio de 2021, afectando directamente a todas aquellas ventanas de ajuste y pronóstico que incluyan dicho intervalo.
 
 ```{r figura de la serie a entrenar}
 #| fig-cap: "Pasajeros transportados por el sistema de Transporte Urbano de Pasajeros en la ciudad de Rosario. El período entre Marzo 2020 a Julio 2021 se estableció como faltante"
@@ -958,6 +970,18 @@ datos_series |>
       pasajeros = if_else((mes_anio >= yearmonth("2020 mar") & mes_anio <= yearmonth("2021 jul")), NA_real_, pasajeros)
     ) |> g1_evol_serie()
 ```
+
+```{r modelos_ajustados4}
+#| tbl-cap: "Modelos ajustados en cada fase"
+#| label: tbl-ajuste-stm
+
+data.frame(
+  entrenamiento = c("1", "2", "3", "4", "5"),
+  modelos = c("$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(1,0,2)(0,1,0)_{12}$")
+) |> 
+  kable(col.names = c("Ventana", "Modelos ajustados"))
+```
+
 
 Como consecuencia, el modelo no toma en cuenta la caída abrupta observada durante la pandemia, sino que extrapola la dinámica previa a la misma. En la @fig-pronostico4 se puede observar que los pronósticos durante los años 2020 y 2021 están muy por encima de los valores reales, comportamiento que resulta esperable dado que no se consideran esas observaciones durante el ajuste de los modelos. 
 
@@ -986,7 +1010,7 @@ g6_graf_pronosticos(ajuste3$pronostico, 2024, 80, color = "#E51010")
 
 #### Lo que podría haber ocurrido (*what might have been*)
 
-A diferencia del método anterior, en este caso se opta por imputar los valores faltantes correspondientes a el período comprendido entre Marzo 2020 - Julio 2021. Para ello, se reemplazo cada observación faltante por el promedio de cada mes utilizando las observaciones de los 3 años previos al inicio de la interrupción.
+A diferencia del método anterior, en este caso se opta por imputar los valores faltantes correspondientes al período comprendido entre Marzo 2020 - Julio 2021. Para ello, se reemplazó cada observación faltante por el promedio de cada mes utilizando las observaciones de los 3 años previos al inicio de la interrupción.
 
 ```{r figura de la serie a entrenar 2}
 #| fig-cap: "Pasajeros transportados por el sistema de Transporte Urbano de Pasajeros en la ciudad de Rosario. El período entre Marzo 2020 a Julio 2021 se reconstruyó utilizando el promedio de cada mes con los 3 años previos a Marzo 2020."
@@ -1004,13 +1028,35 @@ datos_series_wmhb <- datos_series |>
   left_join(promedio_3a, by = "Mes") |> 
   mutate(pasajeros = if_else((mes_anio >= yearmonth("2020 Mar") & mes_anio <= yearmonth("2021 Jul")), ave, pasajeros)) |> 
   dplyr::select(-ave)
-  
-datos_series_wmhb |> g1_evol_serie()
+
+datos_series_wmhb |> 
+  mutate(Periodo = if_else((mes_anio >= yearmonth("2020 Mar") & mes_anio <= yearmonth("2021 Jul")), "Reconstrucción", "Original")) |> 
+  ggplot() +
+    aes(x = mes_anio, y = pasajeros) + 
+    geom_line() +
+    geom_point(aes(color = Periodo), size = 0.75) +
+    labs(x = "Año", y = "Pasajeros (cientos de miles)") +
+    scale_color_manual(values = c("dodgerblue2", "firebrick2")) +
+    scale_x_yearmonth(date_breaks = "1 year", date_labels = "%Y") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1),
+          legend.position = "bottom")
+```
+
+```{r modelos_ajustados4}
+#| tbl-cap: "Modelos ajustados en cada fase"
+#| label: tbl-ajuste-wmhb
+
+data.frame(
+  entrenamiento = c("1", "2", "3", "4", "5"),
+  modelos = c("$SARIMA(1,0,2)(1,1,0)_{12}$", "$SARIMA(2,0,3)(0,1,1)_{12}$", "$SARIMA(2,0,0)(0,1,1)_{12}$", "$SARIMA(1,0,2)(0,1,1)_{12}$", "$SARIMA(1,0,1)(2,1,1)_{12}$")
+) |> 
+  kable(col.names = c("Ventana", "Modelos ajustados"))
 ```
 
 No obstante, durante la fase de recuperación se observa que este método no logra adaptarse adecuadamente a los cambios abruptos en la dinámica de la serie, dado que la imputación se basa exclusivamente en información previa a la disrupción y, por lo tanto, no incorpora la nueva dinámica de la demanda del servicio. En consecuencia, los errores de pronóstico tienden a ser elevados.
 
-Sin embargo, tal como se muestra en la @fig-pronostico5, a medida que se incorporan nuevas observaciones reales al proceso de estimación, los modelos comienzan a ajustarse progresivamente, generando pronósticos cada vez más cercanos a los valores reales, reduciendo considerablemente los errores de pronóstico. Esto sugiere una mejor capacidad de adaptación en el mediano y largo plazo.
+Sin embargo, tal como se muestra en la @fig-pronostico5, a medida que se incorporan nuevas observaciones reales al proceso de estimación, los modelos comienzan a ajustarse progresivamente, generando pronósticos cada vez más cercanos a los valores reales, reduciendo considerablemente los errores de pronóstico. Este comportamiento evidencia una mayor capacidad de adaptación en el mediano y largo plazo.
 
 ```{r graf_pronosticos5}
 #| label: fig-pronostico5
@@ -1041,7 +1087,7 @@ Para la construcción de los intervalos de predicción, se generan múltiples tr
 
 Tal como se observa en la @fig-pronostico6, los pronósticos obtenidos mediante esta estrategia presentan una adaptación más rápida frente a los cambios abruptos en comparación con los enfoques individuales, lo cual constituye una evidencia de su capacidad para responder ante fases tempranas de eventos disruptivos. Asimismo, en las ventanas de pronóstico posteriores, los valores estimados se mantienen cercanos a los observados, reflejando un desempeño consistente a lo largo del tiempo.
 
-Por lo tanto, estos resultados indican que la estrategia de combinación no solo mejora la precisión predictiva, sino que también aporta mayor estabilidad y capacidad de adaptación, posicionándose como una buena alternativa frente a este tipo de escenarios.
+Por lo tanto, estos resultados indican que la estrategia de combinación puede contribuir a mejorar la precisión predictiva y la estabilidad de los pronósticos, posicionándose como una buena alternativa frente a este tipo de escenarios.
 
 ```{r graf_pronosticos6}
 #| label: fig-pronostico6
@@ -1180,21 +1226,17 @@ resultados_unidos |>
         format = 'pipe', digits = 4)
 ```
 
-Cabe aclarar que, si bien los modelos ARIMA/SARIMA presentan un mejor comportamiento en términos de diagnóstico de residuos (independencia y normalidad), los enfoques más adaptativos, como ETS y los métodos de combinación (*Ensemble*), logran una mayor precisión en el corto plazo. Esto sugiere que, en presencia de eventos disruptivos, la capacidad de adaptación a cambios abruptos resulta más relevante para el pronóstico que el cumplimiento estricto de los supuestos clásicos.
-
 \newpage
 
 ## Diagnóstico y validación de modelos
 
-Con el objetivo de evaluar la adecuación de los modelos ajustados, se realizó un análisis diagnóstico de los residuos asociados a cada una de las metodologías consideradas. En particular, se analizaron gráficamente los residuos estandarizados, las funciones de autocorrelación residual (ACF) y los histogramas correspondientes, complementando dicho análisis mediante el test de Ljung-Box para evaluar la presencia de autocorrelación residual significativa.
+Con el objetivo de evaluar la adecuación de los modelos ajustados, se realizó un análisis diagnóstico de los residuos asociados a cada una de las metodologías consideradas. En particular, se analizaron gráficamente los residuos, las funciones de autocorrelación residual (ACF) y los histogramas correspondientes, complementando dicho análisis mediante el test de Ljung-Box para evaluar la presencia de autocorrelación residual significativa.
 
 Los gráficos diagnósticos completos se presentan en el Anexo, junto con los resultados asociados a cada modelo analizado.
 
-En el caso de los modelos ARIMA/SARIMA, los residuos presentaron un comportamiento compatible con los supuestos clásicos de ruido blanco, sin evidencia significativa de autocorrelación residual. Esto sugiere una adecuada especificación de la estructura temporal capturada por dichos modelos.
+En términos generales, los diagnósticos residuales mostraron resultados satisfactorios para la mayoría de los modelos considerados. No obstante, en el caso de los modelos ARIMA/SARIMA, si bien algunas especificaciones cumplieron adecuadamente los supuestos establecidos, otras presentaron evidencia de autocorrelación residual en determinados rezagos. Asimismo, algunos de los enfoques más adaptativos, particularmente para todos los modelos ETS, exhibieron desviaciones respecto de los supuestos clásicos de normalidad, homocedasticidad o independencia residual. Sin embargo, tales desviaciones resultan esperables en contextos caracterizados por elevada volatilidad y cambios estructurales abruptos, como los observados durante la pandemia de COVID-19, y no impidieron que estos modelos alcanzaran un desempeño predictivo competitivo.
 
-Por otro lado, algunos de los enfoques más adaptativos, particularmente ciertos modelos ETS y estrategias aplicadas durante el período disruptivo, presentaron leves desviaciones respecto de los supuestos clásicos de normalidad, homocedasticidad o independencia residual. Sin embargo, estas desviaciones resultan esperables en contextos caracterizados por alta volatilidad y cambios estructurales abruptos, como los observados durante la pandemia de COVID-19.
-
-En este sentido, los resultados obtenidos muestran que un ajuste residual menos “ideal” desde el punto de vista teórico no necesariamente implica un peor desempeño predictivo. De hecho, algunos modelos que presentaron pequeñas desviaciones en sus diagnósticos lograron adaptarse con mayor rapidez a los nuevos patrones de comportamiento de la serie, obteniendo pronósticos más precisos durante la etapa de recuperación.
+En este sentido, los resultados obtenidos muestran que un ajuste residual menos “ideal” desde el punto de vista teórico no necesariamente implica un peor desempeño predictivo. De hecho, algunos modelos que presentaron desviaciones en sus diagnósticos lograron adaptarse con mayor rapidez a los nuevos patrones de comportamiento de la serie, obteniendo pronósticos más precisos durante la etapa de recuperación.
 
 Esto refuerza una de las principales conclusiones metodológicas del trabajo: en contextos de series temporales interrumpidas, la capacidad adaptativa de los modelos puede adquirir mayor relevancia práctica que el cumplimiento estricto de ciertos supuestos clásicos asociados a escenarios de estabilidad estructural.
 
@@ -1204,9 +1246,9 @@ Esto refuerza una de las principales conclusiones metodológicas del trabajo: en
 
 La presente investigación permitió evaluar diversas estrategias para la modelización y pronóstico de series temporales interrumpidas, utilizando como caso de estudio el flujo de pasajeros del Transporte Urbano de Rosario (TUP) durante el impacto de la pandemia de COVID-19. 
 
-Los resultados obtenidos evidencian que los modelos tradicionales ARIMA/SARIMA, si bien constituyen una herramienta sólida y ampliamente utilizada, presentan limitaciones importantes frente a eventos disruptivos. En particular, durante el período en el que ocurre la disrupción y la etapa de recuperación, estos modelos mostraron una menor capacidad de adaptación a los nuevos patrones de comportamiento de la demanda, reflejado en mayores errores de predicción.
+Los resultados obtenidos evidencian que los modelos tradicionales ARIMA/SARIMA, si bien constituyen una herramienta ampliamente utilizada, presentan limitaciones importantes frente a eventos disruptivos. En particular, durante el período en el que ocurre la disrupción y la etapa de recuperación, estos modelos mostraron una menor capacidad de adaptación a los nuevos patrones de comportamiento de la demanda, reflejado en mayores errores de predicción.
 
-Por el contrario, los modelos altamente adaptativos (ETS) demostraron una mejor capacidad para ajustarse a las variaciones recientes de la serie, capturando con mayor rapidez las modificaciones en la tendencia y en la estacionalidad. Esta característica permitió obtener pronósticos más precisos durante las fases de recuperación y estabilización, especialmente en contextos donde los patrones históricos dejaron de ser representativos del comportamiento futuro.
+Por el contrario, los modelos altamente adaptativos (ETS) demostraron una mejor capacidad para ajustarse a las variaciones recientes de la serie, capturando con mayor rapidez las modificaciones en la tendencia y en la estacionalidad. Esta característica permitió obtener pronósticos más precisos durante las fases de recuperación y estabilización, especialmente en este contexto donde los patrones históricos dejaron de ser representativos del comportamiento futuro.
 
 Asimismo, los modelos de intervención permitieron incorporar explícitamente el efecto del *shock* y su posterior recuperación mediante variables explicativas. No obstante, los resultados reflejaron una capacidad limitada de adaptación ante escenarios caracterizados por cambios abruptos y elevada incertidumbre.
 
@@ -1216,7 +1258,7 @@ Por último, los resultados obtenidos utilizando la estrategia de combinación (
 
 Sin embargo, el análisis comparativo realizado pone de manifiesto que el rendimiento de las distintas metodologías varía considerablemente según la etapa del período disruptivo analizado. En consecuencia, no puede afirmarse la existencia de un método óptimo en términos generales, sino más bien de enfoques relativamente más adecuados dependiendo de la fase considerada.
 
-En concordancia con los desarrollos recientes de Hyndman y Rostami-Tabar (2024), esta investigación confirma que, en contextos de series interrumpidas, la prioridad debe desplazarse de la "pureza estadística" de los residuos hacia la adaptabilidad del pronóstico. Se observó que, aunque algunos enfoques presentaban ciertas desviaciones en los supuestos de normalidad o independencia de residuos (producto de la volatilidad extrema del periodo), su desempeño predictivo fue superior. Esto sugiere que la capacidad de un modelo para adaptarse a una "nueva normalidad" puede resultar más relevante que el cumplimiento estricto de determinados supuestos clásicos cuando el objetivo principal es obtener pronósticos precisos en contextos de elevada incertidumbre.
+En concordancia con los desarrollos recientes de Hyndman y Rostami-Tabar (2024), esta investigación confirma que, en contextos de series interrumpidas, la prioridad debe desplazarse de la "pureza estadística" de los residuos hacia la adaptabilidad del pronóstico. Se observó que, aunque algunos enfoques presentaban ciertas desviaciones en los supuestos de normalidad o independencia de residuos (producto de la volatilidad extrema del periodo), su desempeño predictivo fue superior. Los resultados observados muestran que la capacidad de un modelo para adaptarse a una "nueva normalidad" puede resultar más relevante que el cumplimiento estricto de determinados supuestos clásicos cuando el objetivo principal es obtener pronósticos precisos en contextos de alta incertidumbre.
 
 \newpage
 
@@ -1224,7 +1266,7 @@ En concordancia con los desarrollos recientes de Hyndman y Rostami-Tabar (2024),
 
 La principal contribución de esta tesina consiste en aportar evidencia empírica sobre el desempeño de distintas estrategias de pronóstico aplicadas a series temporales interrumpidas, a partir del análisis de un caso de estudio real y de relevancia social como la movilidad urbana en la ciudad de Rosario durante y después de la pandemia de COVID-19.
 
-Desde una perspectiva aplicada, los resultados obtenidos proporcionan herramientas útiles para organismos vinculados a la planificación y gestión del transporte urbano, particularmente para el **Ente de la Movilidad de Rosario (EMR)**. La identificación de metodologías más robustas frente a shocks exógenos permite mejorar la capacidad de respuesta ante situaciones extraordinarias, facilitando el proceso de toma de decisiones estratégicas y operativas en contextos de alta incertidumbre.
+Desde una perspectiva aplicada, los resultados obtenidos proporcionan herramientas útiles para organismos vinculados a la planificación y gestión del transporte urbano, particularmente para el **Ente de la Movilidad de Rosario (EMR)**. La identificación de metodologías más robustas frente a *shocks* exógenos permite mejorar la capacidad de respuesta ante situaciones inusuales, facilitando el proceso de toma de decisiones estratégicas y operativas.
 
 Además, el trabajo evidencia que los cambios producidos por la pandemia no constituyen únicamente perturbaciones transitorias, sino que pueden generar modificaciones persistentes en los patrones de movilidad urbana. En este sentido, los resultados obtenidos refuerzan la importancia de utilizar enfoques de modelización capaces de adaptarse a cambios estructurales y dinámicas no lineales en la evolución de la demanda.
 
@@ -1314,13 +1356,28 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_arima_sarima1}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_arima_sarima |> 
   filter(.id == 1) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_sarima1}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
+res_m1 <- ajuste1$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m1$.innov)[[1]], nortest::lillie.test(res_m1$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m1$.innov)[[2]], nortest::lillie.test(res_m1$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 
@@ -1334,13 +1391,28 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_arima_sarima2}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
 #| cap-location: "bottom"
 
 lb_arima_sarima |> 
   filter(.id == 2) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_sarima2}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+
+res_m2 <- ajuste1$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m2$.innov)[[1]], nortest::lillie.test(res_m2$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m2$.innov)[[2]], nortest::lillie.test(res_m2$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos3}
@@ -1353,13 +1425,28 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_arima_sarima3}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
 #| cap-location: "bottom"
 
 lb_arima_sarima |> 
   filter(.id == 3) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_sarima3}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+
+res_m3 <- ajuste1$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m3$.innov)[[1]], nortest::lillie.test(res_m3$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m3$.innov)[[2]], nortest::lillie.test(res_m3$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos4}
@@ -1372,13 +1459,28 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_arima_sarima4}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $SARIMA(1,1,3)(0,0,1)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $SARIMA(1,1,3)(0,0,1)_{12}$"
 #| cap-location: "bottom"
 
 lb_arima_sarima |> 
   filter(.id == 4) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_sarima4}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,1,3)(0,0,1)_{12}$"
+
+res_m4 <- ajuste1$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m4$.innov)[[1]], nortest::lillie.test(res_m4$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m4$.innov)[[2]], nortest::lillie.test(res_m4$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos5}
@@ -1391,13 +1493,28 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_arima_sarima5}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
 #| cap-location: "bottom"
 
 lb_arima_sarima |> 
   filter(.id == 5) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_sarima5}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,1,3)(0,0,2)_{12}$"
+
+res_m5 <- ajuste1$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m5$.innov)[[1]], nortest::lillie.test(res_m5$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m5$.innov)[[2]], nortest::lillie.test(res_m5$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos6}
@@ -1410,12 +1527,27 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_ets1}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $ETS(M,A,A)$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $ETS(M,A,A)$"
 
 lb_ets |> 
   filter(.id == 1) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_ets1}
+#| tbl-cap: "Tests de normalidad del modelo $ETS(M,A,A)$"
+
+res_m6 <- ajuste1$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(ets) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m6$.innov)[[1]], nortest::lillie.test(res_m6$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m6$.innov)[[2]], nortest::lillie.test(res_m6$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos7}
@@ -1428,12 +1560,27 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_ets2}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $ETS(A,N,A)$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $ETS(A,N,A)$"
 
 lb_ets |> 
   filter(.id == 2) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_ets2}
+#| tbl-cap: "Tests de normalidad del modelo $ETS(A,N,A)$"
+
+res_m7 <- ajuste1$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(ets) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m7$.innov)[[1]], nortest::lillie.test(res_m7$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m7$.innov)[[2]], nortest::lillie.test(res_m7$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos8}
@@ -1446,12 +1593,27 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_ets3}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $ETS(A,N,A)$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $ETS(A,N,A)$"
 
 lb_ets |> 
   filter(.id == 3) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_ets3}
+#| tbl-cap: "Tests de normalidad del modelo $ETS(A,N,A)$"
+
+res_m8 <- ajuste1$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(ets) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m8$.innov)[[1]], nortest::lillie.test(res_m8$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m8$.innov)[[2]], nortest::lillie.test(res_m8$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos9}
@@ -1464,12 +1626,27 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_ets4}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $ETS(A,N,A)$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $ETS(A,N,A)$"
 
 lb_ets |> 
   filter(.id == 4) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_ets4}
+#| tbl-cap: "Tests de normalidad del modelo $ETS(A,N,A)$"
+
+res_m9 <- ajuste1$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(ets) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m9$.innov)[[1]], nortest::lillie.test(res_m9$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m9$.innov)[[2]], nortest::lillie.test(res_m9$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos10}
@@ -1482,12 +1659,27 @@ ajuste1$modelos |>
 ```
 
 ```{r lb_ets5}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo $ETS(A,N,A)$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo $ETS(A,N,A)$"
 
 lb_ets |> 
   filter(.id == 5) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_ets5}
+#| tbl-cap: "Tests de normalidad del modelo $ETS(A,N,A)$"
+
+res_m10 <- ajuste1$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(ets) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m10$.innov)[[1]], nortest::lillie.test(res_m10$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m10$.innov)[[2]], nortest::lillie.test(res_m10$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos11}
@@ -1500,13 +1692,28 @@ ajuste2$modelos |>
 ```
 
 ```{r lb_mint1}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo intervención $SARIMA(1,0,2)(1,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo intervención $SARIMA(1,0,2)(1,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_mint |> 
   filter(.id == 1) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_mint1}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
+res_m11 <- ajuste2$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m11$.innov)[[1]], nortest::lillie.test(res_m11$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m11$.innov)[[2]], nortest::lillie.test(res_m11$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos12}
@@ -1519,13 +1726,28 @@ ajuste2$modelos |>
 ```
 
 ```{r lb_mint2}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo intervención $SARIMA(0,1,1)(0,0,1)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo intervención $SARIMA(0,1,1)(0,0,1)_{12}$"
 #| cap-location: "bottom"
 
 lb_mint |> 
   filter(.id == 2) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_mint2}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(0,1,1)(0,0,1)_{12}$"
+
+res_m12 <- ajuste2$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m12$.innov)[[1]], nortest::lillie.test(res_m12$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m12$.innov)[[2]], nortest::lillie.test(res_m12$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos13}
@@ -1538,13 +1760,28 @@ ajuste2$modelos |>
 ```
 
 ```{r lb_mint3}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo intervención $SARIMA(1,0,2)(0,0,2)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo intervención $SARIMA(1,0,2)(0,0,2)_{12}$"
 #| cap-location: "bottom"
 
 lb_mint |> 
   filter(.id == 3) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_mint3}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(0,0,2)_{12}$"
+
+res_m13 <- ajuste2$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m13$.innov)[[1]], nortest::lillie.test(res_m13$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m13$.innov)[[2]], nortest::lillie.test(res_m13$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos14}
@@ -1557,13 +1794,28 @@ ajuste2$modelos |>
 ```
 
 ```{r lb_mint4}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo intervención $SARIMA(1,0,2)(0,0,2)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo intervención $SARIMA(1,0,2)(0,0,2)_{12}$"
 #| cap-location: "bottom"
 
 lb_mint |> 
   filter(.id == 4) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_mint4}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(0,0,2)_{12}$"
+
+res_m14 <- ajuste2$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m14$.innov)[[1]], nortest::lillie.test(res_m14$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m14$.innov)[[2]], nortest::lillie.test(res_m14$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos15}
@@ -1576,13 +1828,28 @@ ajuste2$modelos |>
 ```
 
 ```{r lb_mint5}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo intervención $SARIMA(1,0,2)(0,0,2)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo intervención $SARIMA(1,0,2)(0,0,2)_{12}$"
 #| cap-location: "bottom"
 
 lb_mint |> 
   filter(.id == 5) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_mint5}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(0,0,2)_{12}$"
+
+res_m15 <- ajuste2$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m15$.innov)[[1]], nortest::lillie.test(res_m15$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m15$.innov)[[2]], nortest::lillie.test(res_m15$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos16}
@@ -1595,13 +1862,28 @@ ajuste3$modelos |>
 ```
 
 ```{r lb_stm1}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_stm |> 
   filter(.id == 1) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_stm1}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
+res_m16 <- ajuste3$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m16$.innov)[[1]], nortest::lillie.test(res_m16$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m16$.innov)[[2]], nortest::lillie.test(res_m16$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos17}
@@ -1614,13 +1896,28 @@ ajuste3$modelos |>
 ```
 
 ```{r lb_stm2}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_stm |> 
   filter(.id == 2) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_stm2}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
+res_m17 <- ajuste3$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m17$.innov)[[1]], nortest::lillie.test(res_m17$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m17$.innov)[[2]], nortest::lillie.test(res_m17$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos18}
@@ -1633,13 +1930,28 @@ ajuste3$modelos |>
 ```
 
 ```{r lb_stm3}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_stm |> 
   filter(.id == 3) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_stm3}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
+res_m18 <- ajuste3$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m18$.innov)[[1]], nortest::lillie.test(res_m18$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m18$.innov)[[2]], nortest::lillie.test(res_m18$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos19}
@@ -1652,13 +1964,28 @@ ajuste3$modelos |>
 ```
 
 ```{r lb_stm4}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo stm $SARIMA(1,0,2)(1,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_stm |> 
   filter(.id == 4) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_stm4}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
+res_m19 <- ajuste3$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m19$.innov)[[1]], nortest::lillie.test(res_m19$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m19$.innov)[[2]], nortest::lillie.test(res_m19$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos20}
@@ -1671,13 +1998,28 @@ ajuste3$modelos |>
 ```
 
 ```{r lb_stm5}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo stm $SARIMA(1,0,2)(0,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo stm $SARIMA(1,0,2)(0,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_stm |> 
   filter(.id == 5) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_stm5}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(0,1,0)_{12}$"
+
+res_m20 <- ajuste3$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m20$.innov)[[1]], nortest::lillie.test(res_m20$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m20$.innov)[[2]], nortest::lillie.test(res_m20$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos21}
@@ -1690,13 +2032,28 @@ ajuste4$modelos |>
 ```
 
 ```{r lb_wmhb1}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo wmhb $SARIMA(1,0,2)(1,1,0)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo wmhb $SARIMA(1,0,2)(1,1,0)_{12}$"
 #| cap-location: "bottom"
 
 lb_wmhb |> 
   filter(.id == 1) |> 
   dplyr::select(lag, lb_stat, lb_pvalue) |> 
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
+```
+
+```{r normalidad_wmhb1}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(1,1,0)_{12}$"
+
+res_m21 <- ajuste4$modelos |>
+  filter(.id == 1) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m21$.innov)[[1]], nortest::lillie.test(res_m21$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m21$.innov)[[2]], nortest::lillie.test(res_m21$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
 ```
 
 ```{r residuos modelos22}
@@ -1709,7 +2066,7 @@ ajuste4$modelos |>
 ```
 
 ```{r lb_wmhb2}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo wmhb $SARIMA(2,0,3)(0,1,1)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo wmhb $SARIMA(2,0,3)(0,1,1)_{12}$"
 #| cap-location: "bottom"
 
 lb_wmhb |> 
@@ -1718,6 +2075,20 @@ lb_wmhb |>
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
 ```
 
+```{r normalidad_wmhb2}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(2,0,3)(0,1,1)_{12}$"
+
+res_m22 <- ajuste4$modelos |>
+  filter(.id == 2) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m22$.innov)[[1]], nortest::lillie.test(res_m22$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m22$.innov)[[2]], nortest::lillie.test(res_m22$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
+```
 
 ```{r residuos modelos23}
 #| fig-cap: "Residuos modelo wmhb $SARIMA(2,0,0)(0,1,1)_{12}$"
@@ -1729,7 +2100,7 @@ ajuste4$modelos |>
 ```
 
 ```{r lb_wmhb3}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo wmhb $SARIMA(2,0,0)(0,1,1)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo wmhb $SARIMA(2,0,0)(0,1,1)_{12}$"
 #| cap-location: "bottom"
 
 lb_wmhb |> 
@@ -1738,6 +2109,20 @@ lb_wmhb |>
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
 ```
 
+```{r normalidad_wmhb3}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(2,0,0)(0,1,1)_{12}$"
+
+res_m23 <- ajuste4$modelos |>
+  filter(.id == 3) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m23$.innov)[[1]], nortest::lillie.test(res_m23$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m23$.innov)[[2]], nortest::lillie.test(res_m23$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
+```
 
 ```{r residuos modelos24}
 #| fig-cap: "Residuos modelo wmhb $SARIMA(1,0,2)(0,1,1)_{12}$"
@@ -1749,7 +2134,7 @@ ajuste4$modelos |>
 ```
 
 ```{r lb_wmhb4}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo wmhb $SARIMA(1,0,2)(0,1,1)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo wmhb $SARIMA(1,0,2)(0,1,1)_{12}$"
 #| cap-location: "bottom"
 
 lb_wmhb |> 
@@ -1758,6 +2143,20 @@ lb_wmhb |>
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
 ```
 
+```{r normalidad_wmhb4}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,2)(0,1,1)_{12}$"
+
+res_m24 <- ajuste4$modelos |>
+  filter(.id == 4) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m24$.innov)[[1]], nortest::lillie.test(res_m24$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m24$.innov)[[2]], nortest::lillie.test(res_m24$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
+```
 
 ```{r residuos modelos25}
 #| fig-cap: "Residuos modelo wmhb $SARIMA(1,0,1)(2,1,1)_{12}$"
@@ -1769,7 +2168,7 @@ ajuste4$modelos |>
 ```
 
 ```{r lb_wmhb5}
-#| tbl-cap: "Tabla del test de Ljung-Box modelo wmhb $SARIMA(1,0,1)(2,1,1)_{12}$"
+#| tbl-cap: "Test de Ljung-Box cada 12 rezagos del modelo wmhb $SARIMA(1,0,1)(2,1,1)_{12}$"
 #| cap-location: "bottom"
 
 lb_wmhb |> 
@@ -1778,6 +2177,20 @@ lb_wmhb |>
   kable(col.names = c("Lag", "Estadística", "P-Valor"), format = "pipe", digits = 4)
 ```
 
+```{r normalidad_wmhb5}
+#| tbl-cap: "Tests de normalidad del modelo $SARIMA(1,0,1)(2,1,1)_{12}$"
+
+res_m25 <- ajuste4$modelos |>
+  filter(.id == 5) |> 
+  dplyr::select(arima) |> 
+  augment()
+
+data.frame(
+  test = c("Shapiro-Wilk", "Lilliefors"),
+  est = c(shapiro.test(res_m25$.innov)[[1]], nortest::lillie.test(res_m25$.innov)[[1]]),
+  pvalue = c(shapiro.test(res_m25$.innov)[[2]], nortest::lillie.test(res_m25$.innov)[[2]])
+) |> kable(col.names = c("Test", "Estadística", "P-Valor"), row.names = FALSE, digits = 4, format = "pipe")
+```
 
 ```{r resultados modelos 1}
 #| fig-cap: "Evaluación de los pronósticos usando (RMSE) para cada enfoque"
@@ -1850,7 +2263,9 @@ resultados_unidos |>
 
 **Hyndman, R. J., & Athanasopoulos, G. (2021).** *Forecasting: Principles and Practice* (3rd ed.). OTexts. [https://otexts.com/fpp3/](https://otexts.com/fpp3/)
 
-**Peña, D. (2005).** *Análisis de series temporales*  Alianza Editorial.
+**Peña, D. (2005).** *Análisis de series temporales*. Alianza Editorial.
+
+**Tulio, I. O. (2024).** *Análisis de los cambios en el sistema de transporte urbano de pasajeros de la ciudad de Rosario mediante el enfoque de series temporales ARIMA-SARIMA para el período 2006-2024*.
 
 **Wang, X., Hyndman, R. J., Li, F., & Kang, Y. (2023).** Forecast combinations: an over 50-year review. *International Journal of Forecasting, 39*(4), 1518–1547. [https://robjhyndman.com/publications/combinations/](https://robjhyndman.com/publications/combinations/)
 
