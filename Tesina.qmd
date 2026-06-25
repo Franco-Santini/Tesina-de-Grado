@@ -34,15 +34,15 @@ Quiero expresar mi más sincero agradecimiento a todas aquellas personas que me 
 
 En primer lugar, a mis padres, por su apoyo incondicional, su esfuerzo constante y por darme la oportunidad de estudiar.
 
-A mi hermano, por ser mi guía, por escuchar cada queja y aconsejarme todo el tiempo.
+A mi hermano, por ser mi guía, por escuchar cada queja antes y después de los exámenes, y por aconsejarme todo el tiempo.
 
-A todos mis amigos de la facu, por acompañarme muchas horas de estudio en la biblioteca y por meet, y por sobre todas las cosas hacer este camino más agradable.
+A todos mis amigos de la facu, por acompañarme muchas horas de estudio en la biblioteca y por meet, y por sobre todas las cosas hacer este camino muchísimo más fácil.
 
-A mis amigos del pueblo, por bancarme tantos años, por alegrarse tanto como yo en las buenas y no hacerme bajar los brazos en las malas.
+A mis amigos del pueblo, por bancarme tantos años, por ser mi cable a tierra y por alegrarse de mis logros como si fueran suyos.
 
 A todos mis profesores, por su dedicación, compromiso y por transmitir sus conocimientos y experiencias.
 
-A Nanda, mi directora, por acompañarme, apoyarme y confiar en mí durante la realización de este gran trabajo.
+A Nanda, mi directora, por acompañarme, apoyarme y confiar en mí para llevar adelante este gran trabajo.
 
 Finalmente, a la Universidad Nacional de Rosario, por brindarme el espacio, la formación y las oportunidades para crecer tanto en lo académico como en lo personal.
 
@@ -169,7 +169,7 @@ donde $\rho_k$ es el coeficiente de autocorrelación para el rezago $k$, $y_t$ y
 
 \setlength{\parindent}{1.5em}
 
-El coeficiente $\rho_k$ varía de -1 a 1. Si $\rho_k$ esta cerca de 1 indica que los valores de la serie están altamente correlacionados con los valores rezagados en $k$ momentos. Si $\rho_k$ está cerca de -1 indica que los valores de la serie están altamente correlacionados de forma negativa con los valores rezagados en $k$ momentos. Por último, si $\rho_k$ está cerca de 0 indica que no hay una correlación significativa entre los valores de la serie para ese rezago.
+El coeficiente $\rho_k$ varía de -1 a 1. Si $\rho_k$ está cerca de 1 indica que los valores de la serie están altamente correlacionados con los valores rezagados en $k$ momentos. Si $\rho_k$ está cerca de -1 indica que los valores de la serie están altamente correlacionados de forma negativa con los valores rezagados en $k$ momentos. Por último, si $\rho_k$ está cerca de 0 indica que no hay una correlación significativa entre los valores de la serie para ese rezago.
 
 #### Función de Autocorrelación Parcial
 
@@ -331,7 +331,7 @@ Con respecto a la estimación de los parámetros, una opción puede ser elegir l
 
 \vspace{0.2cm}
 
-El método lineal de Holt constituye una extensión del Suavizado exponencial simple, que permite pronósticar series temporales que presentan tendencia. Éste involucra una ecuación de pronóstico y dos ecuaciones de suavizado (una para el nivel y una para la tendencia):
+El método lineal de Holt constituye una extensión del Suavizado exponencial simple, que permite pronosticar series temporales que presentan tendencia. Éste involucra una ecuación de pronóstico y dos ecuaciones de suavizado (una para el nivel y una para la tendencia):
 
 - Ecuación de pronóstico: $\hat{y}_{T+h|T} = \ell_t + hb_t$
 - Ecuación de nivel: $\ell_t = \alpha y_t + (1-\alpha)(\ell_{t-1} + b_{t-1})$
@@ -919,7 +919,7 @@ Esta variable captura la drástica reducción en la utilización del servicio p�
 Adicionalmente, con el fin de enriquecer la especificación del modelo, se incorporó una segunda variable indicadora ($x_{2,t}$) con el objetivo que la misma capture el aumento progresivo y no lineal de la demanda del servicio. La misma se la define como:
 
 $$x_{2,t} = \left\{\begin{matrix}
-1 & \text{si} \ t \in \ \text{Agosto 2021 - Dicimiebre 2024} \\
+1 & \text{si} \ t \in \ \text{Agosto 2021 - Diciembre 2024} \\
 0 & \text{en otro caso}\\
 \end{matrix}\right.$${#eq-segvarindicadora}
 
@@ -1043,7 +1043,7 @@ datos_series_wmhb |>
           legend.position = "bottom")
 ```
 
-```{r modelos_ajustados4}
+```{r modelos_ajustados5}
 #| tbl-cap: "Modelos ajustados en cada fase"
 #| label: tbl-ajuste-wmhb
 
@@ -1234,11 +1234,11 @@ Con el objetivo de evaluar la adecuación de los modelos ajustados, se realizó 
 
 Los gráficos diagnósticos completos se presentan en el Anexo, junto con los resultados asociados a cada modelo analizado.
 
-En términos generales, los diagnósticos residuales mostraron resultados satisfactorios para la mayoría de los modelos considerados. No obstante, en el caso de los modelos ARIMA/SARIMA, si bien algunas especificaciones cumplieron adecuadamente los supuestos establecidos, otras presentaron evidencia de autocorrelación residual en determinados rezagos. Asimismo, algunos de los enfoques más adaptativos, particularmente para todos los modelos ETS, exhibieron desviaciones respecto de los supuestos clásicos de normalidad, homocedasticidad o independencia residual. Sin embargo, tales desviaciones resultan esperables en contextos caracterizados por elevada volatilidad y cambios estructurales abruptos, como los observados durante la pandemia de COVID-19, y no impidieron que estos modelos alcanzaran un desempeño predictivo competitivo.
+Los diagnósticos residuales evidenciaron que ninguno de los modelos analizados cumplió de manera estricta con la totalidad de los supuestos clásicos. Sin embargo, estas limitaciones resultan consistentes con la complejidad inherente a una serie temporal afectada por cambios estructurales abruptos y altos niveles de volatilidad, como los observados durante la pandemia de COVID-19.
 
-En este sentido, los resultados obtenidos muestran que un ajuste residual menos “ideal” desde el punto de vista teórico no necesariamente implica un peor desempeño predictivo. De hecho, algunos modelos que presentaron desviaciones en sus diagnósticos lograron adaptarse con mayor rapidez a los nuevos patrones de comportamiento de la serie, obteniendo pronósticos más precisos durante la etapa de recuperación.
+En este sentido, los resultados obtenidos muestran que un ajuste residual menos “ideal” desde el punto de vista teórico no necesariamente implica un peor desempeño predictivo. De hecho, aun ante el incumplimiento de los supuestos, aquellos modelos que lograron adaptarse con mayor rapidez a los nuevos patrones de comportamiento de la serie, obtuvieron pronósticos más precisos durante la etapa de recuperación.
 
-Esto refuerza una de las principales conclusiones metodológicas del trabajo: en contextos de series temporales interrumpidas, la capacidad adaptativa de los modelos puede adquirir mayor relevancia práctica que el cumplimiento estricto de ciertos supuestos clásicos asociados a escenarios de estabilidad estructural.
+Dicha evidencia refuerza una de las principales conclusiones metodológicas del trabajo: en contextos de series temporales interrumpidas, la capacidad adaptativa de los modelos puede adquirir mayor relevancia práctica que el cumplimiento estricto de ciertos supuestos clásicos asociados a escenarios de estabilidad estructural. Esto resulta consistente con los hallazgos observados en la comparación empírica de pronósticos y constituye uno de los principales aportes metodológicos de la presente investigación.
 
 \newpage
 
@@ -1555,7 +1555,7 @@ data.frame(
 
 ajuste1$modelos |>
   filter(.id == 2) |> 
-  dplyr::select(arima) |> 
+  dplyr::select(ets) |> 
   gg_tsresiduals()
 ```
 
@@ -1588,7 +1588,7 @@ data.frame(
 
 ajuste1$modelos |>
   filter(.id == 3) |> 
-  dplyr::select(arima) |> 
+  dplyr::select(ets) |> 
   gg_tsresiduals()
 ```
 
@@ -1621,7 +1621,7 @@ data.frame(
 
 ajuste1$modelos |>
   filter(.id == 4) |> 
-  dplyr::select(arima) |> 
+  dplyr::select(ets) |> 
   gg_tsresiduals()
 ```
 
@@ -1654,7 +1654,7 @@ data.frame(
 
 ajuste1$modelos |>
   filter(.id == 5) |> 
-  dplyr::select(arima) |> 
+  dplyr::select(ets) |> 
   gg_tsresiduals()
 ```
 
