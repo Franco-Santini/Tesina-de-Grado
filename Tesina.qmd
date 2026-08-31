@@ -80,9 +80,9 @@ Los *shocks* exógenos -tales como pandemias, reformas regulatorias, cambios en 
 
 Un caso particularmente relevante, tanto en Argentina como a nivel mundial, es la pandemia de COVID-19. Durante el año 2020, esta produjo una alteración abrupta en las series de movilidad y transporte urbano: el volumen de pasajeros transportados cayó a mínimos históricos debido a las restricciones de circulación, seguido de una recuperación lenta y heterogénea a medida que las restricciones se fueron flexibilizando. Estas características convierten a las series de transporte y movilidad en un contexto adecuado para el análisis de metodologías robustas para el tratamiento de series temporalmente interrumpidas.
 
-Recientemente, Hyndman y Rostami-Tabar (2024) han sistematizado diversas estrategias para el tratamiento y pronóstico de series interrumpidas, incluyendo modelos altamente adaptativos, modelos de intervención, métodos contrafactuales y combinaciones (*ensembles*), planteando un marco conceptual que resulta particularmente relevante para series afectadas por *shocks* como los observados en el transporte urbano durante la pandemia.
+Recientemente, Hyndman y Rostami-Tabar (2024) han sistematizado diversas estrategias para el tratamiento y pronóstico de series interrumpidas, incluyendo modelos altamente adaptativos, modelos de intervención, métodos contrafactuales y combinaciones (*ensembles*), planteando un marco conceptual particularmente relevante para series afectadas por *shocks* como los observados en el transporte urbano durante la pandemia.
 
-En este contexto, la presente tesina propone evaluar el desempeño de distintas metodologías de pronóstico para series temporales interrumpidas mediante su aplicación a la serie mensual de pasajeros del Transporte Urbano de Pasajeros (TUP) de la ciudad de Rosario. A través de la comparación de estas estrategias en el periodo disruptivo y la etapa posterior, se busca generar evidencia empírica que contribuya a la comprensión de su comportamiento frente a cambios estructurales abruptos y al análisis de series temporales en escenarios de alta incertidumbre.
+En este contexto, la presente tesina propone evaluar el desempeño de distintas metodologías de pronóstico para series temporales interrumpidas, aplicadas a la serie mensual de pasajeros del Transporte Urbano de Pasajeros (TUP) de la ciudad de Rosario. La comparación de estas estrategias en el periodo disruptivo y en la etapa posterior busca aportar evidencia empírica sobre su comportamiento frente a cambios estructurales abruptos e incertidumbre elevada.
 
 
 \newpage
@@ -179,7 +179,7 @@ El coeficiente $\rho_k$ varía de -1 a 1. Si $\rho_k$ está cerca de 1 indica qu
 
 #### Función de Autocorrelación Parcial
 
-La Función de Autocorrelación Parcial (PACF, por sus siglas en inglés) permite medir la relación lineal directa entre una observación y su valor rezagado $k$, eliminando previamente el efecto de los rezagos intermedios $1, 2, ..., k-1$. A diferencia de la Función de Autocorrelación (ACF), que capta tanto efectos directos como indirectos entre los valores de la serie, la PACF aísla la contribución de cada rezago respecto de la de dichos rezagos intermedios, sin que ello suponga eliminar el efecto de los rezagos posteriores $k+1, k+2, ...$, que continúan contribuyendo a la relación entre las observaciones. La expresión de la autocorrelación parcial correspondiente al rezago $k$ resulta:
+La Función de Autocorrelación Parcial (PACF, por sus siglas en inglés) permite medir la relación lineal entre una observación y su valor rezagado $k$, eliminando el efecto lineal de los rezagos intermedios $1, 2, ..., k-1$.  A diferencia de la Función de Autocorrelación (ACF), la PACF mide dicha asociación una vez controlado el efecto de esos rezagos intermedios. La expresión de la autocorrelación parcial correspondiente al rezago $k$ resulta:
 
 $$\phi_{kk} = Corr(y_t, y_{t+k}|y_{t+1}, y_{t+2},...,y_{t+k-1})$${#eq-pacf}
 
